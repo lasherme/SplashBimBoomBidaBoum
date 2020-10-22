@@ -32,6 +32,13 @@ public class Room extends UnicastRemoteObject implements RoomInterface {
 	public int getSize() throws RemoteException {
 		return this.players.size();
 	}
+	
+	public void setMaxPlayer(int maxPlayer) {
+		
+		if(maxPlayer >= 4) {
+			this.maxPlayer = maxPlayer;
+		}
+	}
 
 	public RoomInterface roomConnection(PlayerInterface player) throws RemoteException {
 		RoomInterface currentRoom = null;
