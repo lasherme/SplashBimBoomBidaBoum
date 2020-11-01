@@ -9,5 +9,5 @@ public interface RoomReservationInterface extends Remote {
 	
 	public RoomInterface getRoom(PlayerInterface player) throws RemoteException;
 	
-	public RoomInterface getRoom(PlayerInterface player, String id) throws RemoteException;
+	public RoomInterface getRoom(PlayerInterface player, String roomId) throws RemoteException;
 }
