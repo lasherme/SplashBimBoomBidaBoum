@@ -17,7 +17,7 @@ public interface RoomInterface extends Remote {
 
 	 int getSize() throws RemoteException;
 
-	 RoomInterface roomConnection(PlayerInterface player) throws RemoteException, MalformedURLException, NotBoundException;
+	RoomInterface roomConnection(PlayerInterface player) throws RemoteException, MalformedURLException, NotBoundException;
 
 	 void isReady(PlayerInterface player) throws RemoteException;
 }

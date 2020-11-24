@@ -27,11 +27,11 @@ public class Game implements Runnable {
             try{
                 p.isDead(false);
                 p.setGameEnds(false);
+
                 p.gameStarts();
             }catch (Exception e){
                 System.out.println(e.toString());
                 inGamePlayers.remove(p);
-
             }
         }
         while(alive.size()>1){

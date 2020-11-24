@@ -46,17 +46,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface{
 		}
 	}
 
-	public RoomInterface roomConnection(PlayerInterface player) throws RemoteException, MalformedURLException, NotBoundException {
-		RoomInterface currentRoom = null;
-
-		queue++;
-		currentRoom = roomConnectionBis(player);
-		queue--;
-
-		return currentRoom;
-	}
-
-	private RoomInterface roomConnectionBis(PlayerInterface player) throws RemoteException, MalformedURLException, NotBoundException {
+	public synchronized RoomInterface roomConnection(PlayerInterface player) throws RemoteException, MalformedURLException, NotBoundException {
 		RoomInterface currentRoom = null;
 
 		if (this.players.size() < maxPlayer) {
@@ -69,6 +59,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface{
 	}
 
 
+
 	public void isReady(PlayerInterface player) throws RemoteException {
 		playerReadyStatus.put(player,!playerReadyStatus.get(player));
 		System.out.println("Someone's ready");
@@ -77,9 +68,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface{
 			System.out.println("All players are ready");
 			runningGame = new Game(players,this);
 			new Thread(runningGame).start();
-
 		}
-
 	}
 
 	private boolean readyCheck() throws RemoteException {

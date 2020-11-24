@@ -20,7 +20,6 @@ public class RoomReservation extends UnicastRemoteObject implements RoomReservat
 	private final int idLength = 6;
 
 	public RoomReservation() throws RemoteException, MalformedURLException, AlreadyBoundException {
-
 		LocateRegistry.createRegistry(PORT);
 		Naming.bind("//" + PREADRRESS + ":" + PORT + "/" + POSTADDRESS, this);
 	}
@@ -28,7 +27,6 @@ public class RoomReservation extends UnicastRemoteObject implements RoomReservat
 	private synchronized RoomInterface createRoom(int maxPlayer) throws RemoteException {
 		RoomInterface currentRoom = null;
 		String id = null;
-
 		do{
 			id = RandomString.generate(idLength); // Generates a random id
 		}while(rooms.containsKey(id));

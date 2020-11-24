@@ -44,7 +44,6 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 
 	public void setIsReady() throws RemoteException{
 		room.isReady(this);
-
 	}
 	public boolean getIsAlive(){
 		return true;
@@ -76,6 +75,7 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 		this.leaderboard = leaderboard;
 	}
 	public void setGameEnds(boolean status){
+		System.out.println("Staus received" + status);
 		this.gameEnds = status;
 	}
 }
