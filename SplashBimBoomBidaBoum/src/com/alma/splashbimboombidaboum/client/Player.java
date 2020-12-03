@@ -7,23 +7,33 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import com.alma.splashbimboombidaboum.server.RoomInterface;
 import com.alma.splashbimboombidaboum.server.RoomReservationInterface;
 import com.alma.splashbimboombidaboum.utility.Address;
 import com.alma.splashbimboombidaboum.utility.RandomString;
+import javafx.scene.input.KeyEvent;
 
 public class Player extends UnicastRemoteObject implements PlayerInterface, Address {
+
 	private String name;
 	private RoomReservationInterface server;
 	private RoomInterface room;
 	private String myAddress = null;
-	private String currentString = null;
+	private KeyEvent currentEvent = null;
 	boolean deathStatus = false;
 	List<String> leaderboard;
 	boolean gameEnds = false;
+	protected Boolean gamestarted = false;
+	List<Obstacle> obstacles = new ArrayList<>();
+	List<String> ennemies = new ArrayList<>();
+
+	int posX = 0; //Starts on the left
+	int posY = 744-130; //Sceneheight-130
+	GameLoop liveGame;
+	Obstacle o;
+	HashMap<String, Character> characterMap = new HashMap<>();
 	public Player(String name) throws MalformedURLException, RemoteException, NotBoundException, AlreadyBoundException {
 		//Player Preparation
 		this.name = name;
@@ -53,15 +63,17 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	}
 	public void gameStarts(){ //game loop
 		System.out.println(name+ "started playing");
-		Game g = new Game(this);
-		new Thread(g).start();
+		//Game g = new Game(this);
+		this.gamestarted = true;
+		//new Thread(g).start();
 	}
-	public String getCurrentAction(){
-		return this.currentString;
+	public KeyEvent getCurrentAction(){
+		return this.currentEvent;
 	}
-	protected void setCurrentString(String s){
-		this.currentString = s;
+	protected void setCurrentEvent(KeyEvent k){
+		this.currentEvent = k;
 	}
+
 	public String getName(){
 		return this.name;
 	}
@@ -77,5 +89,47 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	public void setGameEnds(boolean status){
 		System.out.println("Staus received" + status);
 		this.gameEnds = status;
+	}
+
+	@Override
+	public void setPosX(int val)throws RemoteException {
+		this.posX = val;
+	}
+
+	@Override
+	public int getPosX() throws RemoteException {
+		return this.posX;
+	}
+
+	@Override
+	public void setPosY(int val)throws RemoteException {
+		this.posY = val;
+	}
+
+	@Override
+	public int getPosY() throws RemoteException {
+		return this.posY;
+	}
+
+	@Override
+	public void setObstacle(Obstacle o)throws RemoteException {
+		this.obstacles.add(o);
+	}
+
+	@Override
+	public void setCharacters(HashMap<String,Character> p) throws RemoteException {
+		this.characterMap = p;
+	}
+
+	@Override
+	public void setEnnemies(ArrayList<String> players) throws RemoteException{
+		this.ennemies = players;
+	}
+
+	public Boolean getGamestarted(){
+		return this.gamestarted;
+	}
+	public void setLiveGame(GameLoop g){
+		this.liveGame = g;
 	}
 }

@@ -6,6 +6,11 @@ import java.rmi.RemoteException;
 import java.util.Random;
 
 public class Game implements Runnable {
+    @Override
+    public void run() {
+
+    }
+    /*
     Player myself;
     String currentString = null;
     public Game(Player p ){
@@ -31,5 +36,5 @@ public class Game implements Runnable {
         for(String s: myself.leaderboard){
             System.out.println(s);
         }
-    }
+    }*/
 }
