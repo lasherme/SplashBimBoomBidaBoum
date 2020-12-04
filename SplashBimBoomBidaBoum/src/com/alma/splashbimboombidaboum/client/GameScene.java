@@ -13,7 +13,7 @@ public class GameScene extends GameLoop {
     public GameScene(Stage primaryStage) throws InterruptedException {
         super(primaryStage);
         super.stageWidth = 800;
-        super.stageHeight = 744;
+        super.stageHeight = 800;
     }
 
 

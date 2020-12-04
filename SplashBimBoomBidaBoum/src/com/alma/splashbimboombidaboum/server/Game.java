@@ -24,10 +24,8 @@ public class Game implements Runnable {
         this.myroom = room;
         inGamePlayers = players;
         for(PlayerInterface p : players){
-            input.put(p,"grien");
             alive.add(p);
         }
-
     }
 
     @Override
@@ -46,15 +44,16 @@ public class Game implements Runnable {
                 }
                 for (PlayerInterface p : inGamePlayers) { //Sending models to players
                     try {
-                        characterMap.get(p.getName()).setIsFriendly();
-                        p.setCharacters(characterMap);
-                        characterMap.get(p.getName()).setIsFriendly();
+                        for(String s : characterMap.keySet()){
+
+                            p.setCharacters(s,characterMap.get(s).getTranslateX(),characterMap.get(s).getTranslateY());
+                        }
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
                 }
 
-            while (alive.size() > 1) {
+            while (alive.size() >1) {
                     try {
                         checkColision();
                     } catch (RemoteException e) {
@@ -64,54 +63,70 @@ public class Game implements Runnable {
                     //Creation des obstacles
                     if (new Random().nextInt(100) * 100 < 3 && obstacles.size() < 5) {
                         obstacles.add(new Obstacle());
+                        System.out.println(obstacles.size());
+
                     }
                     //Gestion de la partie
                     for (int i = 0; i < alive.size(); i++) {
                         PlayerInterface p = alive.get(i);
                         try {
                             KeyEvent event = p.getCurrentAction(); //Set timeout????
-                            if (event != null) {
+                            if(event != null) {
                                 switch (event.getCode()) {
                                     case D:
                                     case RIGHT:
-                                        characterMap.get(p).moveRight();
+                                        if (characterMap.get(p.getName()).getTranslateX() < 800) {
+                                            characterMap.get(p.getName()).moveRight();
+                                        }
                                         break;
                                     case Q:
                                     case LEFT:
-                                        characterMap.get(p).moveLeft();
+                                        if (characterMap.get(p.getName()).getTranslateX() >= 0) {
+                                            characterMap.get(p.getName()).moveLeft();
+                                        }
                                         break;
                                     case UP:
                                     case Z:
-                                        characterMap.get(p).moveUp();
+                                        if (characterMap.get(p.getName()).getTranslateY() > 0){
+                                            characterMap.get(p.getName()).moveUp();
+                                        }
                                         break;
                                     case DOWN:
                                     case S:
-                                        characterMap.get(p).moveDown();
+                                        if (characterMap.get(p.getName()).getTranslateY() < 800){
+                                            characterMap.get(p.getName()).moveDown();
+                                        }
+                                        break;
+                                    default:
                                         break;
                                 }
                             }
                         } catch (Exception e) {
-                            System.out.println(e.toString());
+                            System.out.println(e.toString() + "ici: "+i);
                             inGamePlayers.remove(p);
                             alive.remove(p);
                         }
                     }
                     for (PlayerInterface p : inGamePlayers) {
                         try { //Update player pos;
-                            characterMap.get(p.getName()).setIsFriendly();
-                            p.setCharacters(characterMap);
-                            System.out.println(characterMap.keySet().size());
-                            characterMap.get(p.getName()).setIsFriendly();
+                            for(String s : characterMap.keySet()){
+                                p.setCharacters(p.getName(),characterMap.get(s).getTranslateX(),characterMap.get(s).getTranslateY());
+                            }
                         }catch(Exception e){}
                         for (Obstacle o : obstacles) {
                             try {
-                                p.setObstacle(o);
+                                p.setObstacle(o.getId(), o.getTranslateX(),o.getTranslateY());
                             } catch (Exception e) {
 
                             }
                         }
                     }
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+            }
                 System.out.println("Fin de partie");
                 try {
                     leaderboard.add(alive.get(0).getName());
@@ -136,24 +151,30 @@ public class Game implements Runnable {
 
     }
     private void checkColision() throws RemoteException {
-        Rectangle compare =new Rectangle();
+        Rectangle compare = new Rectangle();
         compare.setArcHeight(15);
         compare.setArcWidth(15);
         compare.setWidth(60);
         compare.setHeight(60);
+        ArrayList<PlayerInterface> remove = new ArrayList<>();
         for(PlayerInterface player : alive) {
             compare.setTranslateX(player.getPosX());
             compare.setTranslateY(player.getPosY());
-            for (Rectangle obstacle : obstacles) {
-                if (obstacle.getBoundsInParent().intersects(compare.getBoundsInParent())){
+            for (Obstacle o : obstacles) {
+                if (o.getComponent().getBoundsInParent().intersects(compare.getBoundsInParent())){
                     try {
+                        System.out.println("HIT");
                         player.isDead(true);
                         leaderboard.add(player.getName());
+                        remove.add(player);
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
                 }
             }
+        }
+        for(PlayerInterface p : remove){
+            alive.remove(p);
         }
     }
     public void setxCoord(){

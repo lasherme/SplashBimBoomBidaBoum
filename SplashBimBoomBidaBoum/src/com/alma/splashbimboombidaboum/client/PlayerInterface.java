@@ -17,11 +17,12 @@ public interface PlayerInterface extends Remote{
     void isDead(boolean deathStatus) throws RemoteException;
     void setLeaderboard(List<String> leaderboard) throws RemoteException;
     void setGameEnds(boolean status) throws RemoteException;
-    void setPosX(int val) throws RemoteException;
-    int getPosX() throws RemoteException;
-    void setPosY(int val) throws RemoteException;
-    int getPosY() throws RemoteException;
-    void setObstacle(Obstacle o) throws RemoteException;
-    void setCharacters(HashMap<String,Character> map) throws RemoteException;
+    double getPosX() throws RemoteException;
+    double getPosY() throws RemoteException;
+    void setCharacters(HashMap<String,Character> map) throws RemoteException; //marche pas, serialisation blablabla
+    void setCharacters(String s , double posx,double posy) throws RemoteException;
+
     void setEnnemies(ArrayList<String> players) throws RemoteException;
+
+    void setObstacle(String id, double translateX, double translateY)throws RemoteException;
 }

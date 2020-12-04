@@ -26,7 +26,7 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	List<String> leaderboard;
 	boolean gameEnds = false;
 	protected Boolean gamestarted = false;
-	List<Obstacle> obstacles = new ArrayList<>();
+	Map<String,Obstacle> obstacles = new HashMap<>();
 	List<String> ennemies = new ArrayList<>();
 
 	int posX = 0; //Starts on the left
@@ -91,39 +91,55 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 		this.gameEnds = status;
 	}
 
-	@Override
-	public void setPosX(int val)throws RemoteException {
-		this.posX = val;
-	}
+
 
 	@Override
-	public int getPosX() throws RemoteException {
-		return this.posX;
+	public double getPosX() throws RemoteException {
+		return characterMap.get(Main.player.name).getTranslateX();
 	}
+
+
 
 	@Override
-	public void setPosY(int val)throws RemoteException {
-		this.posY = val;
-	}
+	public double getPosY() throws RemoteException {
+		return characterMap.get(Main.player.name).getTranslateY();
 
-	@Override
-	public int getPosY() throws RemoteException {
-		return this.posY;
 	}
-
+/*
 	@Override
 	public void setObstacle(Obstacle o)throws RemoteException {
 		this.obstacles.add(o);
 	}
-
+*/
 	@Override
 	public void setCharacters(HashMap<String,Character> p) throws RemoteException {
 		this.characterMap = p;
 	}
 
 	@Override
+	public void setCharacters(String s, double posx, double posy) throws RemoteException {
+		if(!characterMap.containsKey(s)){
+			characterMap.put(s,new Character());
+			if(s.equals(Main.player.getName())){
+				characterMap.get(s).setIsFriendly();
+			}
+		}
+		characterMap.get(s).setTranslateX(posx);
+		characterMap.get(s).setTranslateY(posy);
+	}
+
+	@Override
 	public void setEnnemies(ArrayList<String> players) throws RemoteException{
 		this.ennemies = players;
+	}
+
+	@Override
+	public void setObstacle(String id, double translateX, double translateY) throws RemoteException {
+		if(!obstacles.containsKey(id)){
+			obstacles.put(id,new Obstacle(id,translateX,translateY));
+		}else{
+			obstacles.get(id).setTranslateX(translateX);
+		}
 	}
 
 	public Boolean getGamestarted(){

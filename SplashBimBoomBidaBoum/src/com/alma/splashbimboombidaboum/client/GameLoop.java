@@ -4,6 +4,7 @@ import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.WindowEvent;
@@ -48,8 +49,6 @@ public abstract class GameLoop {
         scene.setOnKeyReleased(onReleaseHandler);
         root.getChildren().add(componentsGroup);
         root.getChildren().add(boundsGroup);
-        player = new Character();
-        player.setIsFriendly();
         Main.player.setLiveGame(this);
         HashMap<String, Character> oldpos = new HashMap<>();
         final Boolean[] firstFrame = {true};
@@ -62,18 +61,16 @@ public abstract class GameLoop {
                         }
                         firstFrame[0] = false;
                     }
-                }
-                /*
-                if(!Main.player.gameEnds && Main.player.getGamestarted()){
-                    for(String p : Main.player.characterMap.keySet()){
-                        System.out.println(p);
-                      if(p == Main.player.getName()){
-                          Main.player.characterMap.get(p).setIsFriendly();
-                      }
-                      Main.player.characterMap.get(p).addToComponentGroup(componentsGroup);
+                    System.out.println(Main.player.obstacles.size());
+                    for(String o : Main.player.obstacles.keySet()){
+                        if(!componentsGroup.getChildren().contains(Main.player.obstacles.get(o).getComponent())){
+                            componentsGroup.getChildren().add(Main.player.obstacles.get(o).getComponent());
+                        }
+                        if(Main.player.obstacles.get(o).getTranslateX() < -30){
+                            Main.player.obstacles.remove(o);
+                        }
                     }
                 }
-            */
             }
 
 
@@ -90,48 +87,13 @@ public abstract class GameLoop {
     EventHandler onPressHandler = new EventHandler<KeyEvent>() {
         @Override
         public void handle(KeyEvent event) {
-            switch (event.getCode()) {
-                case D:
-                case RIGHT:
-                    rightPressed = true;
-                    break;
-
-                case Q:
-                case LEFT:
-                    leftPressed = true;
-                    break;
-                case UP:
-                case SPACE:
-                    spacePressed = true;
-                    break;
-                case DOWN:
-                case S:
-                    downPressed = true;
-            }
+            Main.player.setCurrentEvent(event);
         }
     };
     EventHandler onReleaseHandler = new EventHandler<KeyEvent>() {
         @Override
         public void handle(KeyEvent event) {
-            switch (event.getCode()) {
-                case D:
-                case RIGHT:
-                    rightPressed = false;
-                    break;
-
-                case Q:
-                case LEFT:
-                    leftPressed = false;
-                    break;
-
-                case UP:
-                case SPACE:
-                    spacePressed = false;
-                    break;
-                case DOWN:
-                case S:
-                    downPressed = false;
-            }
+            Main.player.setCurrentEvent(null);
         }
     };
     public double getStageHeight(){

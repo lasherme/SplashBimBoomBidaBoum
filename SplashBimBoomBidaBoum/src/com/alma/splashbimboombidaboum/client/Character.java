@@ -11,7 +11,7 @@ public class Character implements Serializable {
     Rectangle mainChar;
     boolean isAlive;
     int speed;
-    private boolean ennemy = true;
+
 
     public Character(){
         mainChar = new Rectangle();
@@ -19,27 +19,25 @@ public class Character implements Serializable {
         mainChar.setArcWidth(15);
         mainChar.setWidth(60);
         mainChar.setHeight(60);
-        if(ennemy){
-            mainChar.setFill(Color.RED);
-        }
-        else{
-            mainChar.setFill(Color.BLUE);
-        }
+
+       mainChar.setFill(Color.RED);
+
+
         mainChar.setTranslateY(614); //744 - 130
         isAlive = true;
         speed = 5;
     }
     public void moveUp(){
-        mainChar.setTranslateY(mainChar.getTranslateY() - 20);
+        mainChar.setTranslateY(mainChar.getTranslateY() - 10);
     }
     public void moveDown(){
-        mainChar.setTranslateY(mainChar.getTranslateY() + 20);
+        mainChar.setTranslateY(mainChar.getTranslateY() + 10);
     }
     public void moveRight(){
-        mainChar.setTranslateX(mainChar.getTranslateX() + speed);
+        mainChar.setTranslateX(mainChar.getTranslateX() + 10);
     }
     public void moveLeft(){
-        mainChar.setTranslateX(mainChar.getTranslateX() - speed);
+        mainChar.setTranslateX(mainChar.getTranslateX() - 10);
     }
     public void setTranslateX(double val){ mainChar.setTranslateX(val);}
     public void setTranslateY(double val){ mainChar.setTranslateY(val);}
@@ -51,21 +49,15 @@ public class Character implements Serializable {
         isAlive = false;
     }
 
-    public double getMaxY(){
-        return mainChar.getBoundsInParent().getMaxY();
-    }
-    public double getMinY(){
-        return mainChar.getBoundsInParent().getMinY();
+    public double getTranslateX(){
+        return mainChar.getTranslateX();
     }
 
-    public double getMaxX(){
-        return mainChar.getBoundsInParent().getMaxX();
-    }
-    public double getMinX(){
-        return mainChar.getBoundsInParent().getMinX();
+    public double getTranslateY(){
+        return mainChar.getTranslateY();
     }
     public void setIsFriendly(){
-        ennemy = !ennemy;
+        mainChar.setFill(Color.BLUE);
     }
     public void addToComponentGroup(Group componentGroup){
         componentGroup.getChildren().add(mainChar);
