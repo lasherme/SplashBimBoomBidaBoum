@@ -28,22 +28,18 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	protected Boolean gamestarted = false;
 	Map<String,Obstacle> obstacles = new HashMap<>();
 	List<String> ennemies = new ArrayList<>();
-
-	int posX = 0; //Starts on the left
-	int posY = 744-130; //Sceneheight-130
 	GameLoop liveGame;
 	Obstacle o;
 	HashMap<String, Character> characterMap = new HashMap<>();
+
 	public Player(String name) throws MalformedURLException, RemoteException, NotBoundException, AlreadyBoundException {
 		//Player Preparation
 		this.name = name;
 		Random r = new Random();
 		int port = (2000+r.nextInt(8000));
-
-		this.myAddress = "//" + PREADRRESS + ":" + port + "/" + RandomString.generate(25);
+		this.myAddress = "//" + PREADRRESS + ":" + port + "/" + PORT;
 		LocateRegistry.createRegistry(port);
 		Naming.bind(myAddress,this);
-
 		//Player connection to server
 		this.server = (RoomReservationInterface) Naming.lookup("//" + PREADRRESS + ":" + PORT + "/" + POSTADDRESS);
 		System.out.println("Connection established with server : \n\t" + this.server.toString());
@@ -62,11 +58,9 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 		return this.myAddress;
 	}
 	public void gameStarts(){ //game loop
-		System.out.println(name+ "started playing");
-		//Game g = new Game(this);
 		this.gamestarted = true;
-		//new Thread(g).start();
 	}
+
 	public KeyEvent getCurrentAction(){
 		return this.currentEvent;
 	}
@@ -91,26 +85,16 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 		this.gameEnds = status;
 	}
 
-
-
 	@Override
 	public double getPosX() throws RemoteException {
-		return characterMap.get(Main.player.name).getTranslateX();
+		return characterMap.get(this.name).getTranslateX();
 	}
-
-
 
 	@Override
 	public double getPosY() throws RemoteException {
-		return characterMap.get(Main.player.name).getTranslateY();
+		return characterMap.get(this.name).getTranslateY();
+	}
 
-	}
-/*
-	@Override
-	public void setObstacle(Obstacle o)throws RemoteException {
-		this.obstacles.add(o);
-	}
-*/
 	@Override
 	public void setCharacters(HashMap<String,Character> p) throws RemoteException {
 		this.characterMap = p;
@@ -145,7 +129,5 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	public Boolean getGamestarted(){
 		return this.gamestarted;
 	}
-	public void setLiveGame(GameLoop g){
-		this.liveGame = g;
-	}
+
 }
