@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 public class Character implements Serializable {
     private Rectangle mainChar;
-    
+
     public Character(){
         mainChar = new Rectangle();
         mainChar.setArcHeight(15);
