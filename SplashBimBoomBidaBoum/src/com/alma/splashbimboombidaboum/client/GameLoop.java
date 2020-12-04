@@ -16,21 +16,13 @@ import java.util.Random;
 
 
 public abstract class GameLoop {
-    Stage stage;
-    Scene scene;
-    Group root;
-    Group boundsGroup;
-    Group componentsGroup;
-
-    double stageWidth;
-    double stageHeight;
-
-    private boolean rightPressed;
-    private boolean leftPressed;
-    private boolean spacePressed;
-    private boolean downPressed;
-    Character player;
-
+    private Stage stage;
+    private Scene scene;
+    private Group root;
+    private Group boundsGroup;
+    private Group componentsGroup;
+    private int height = 800;
+    private int width = 800;
 
     public GameLoop(Stage primaryStage) throws InterruptedException {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -42,13 +34,13 @@ public abstract class GameLoop {
         root = new Group();
         componentsGroup = new Group();
         boundsGroup = new Group();
-        scene = new Scene(root, 800,800);
-        initBackground();
+        scene = new Scene(root, width,height);
+        initBackground(scene,componentsGroup);
         scene.setOnKeyPressed(onPressHandler);
         scene.setOnKeyReleased(onReleaseHandler);
         root.getChildren().add(componentsGroup);
         root.getChildren().add(boundsGroup);
-        Main.player.setLiveGame(this);
+
         final Boolean[] firstFrame = {true};
         new AnimationTimer(){
             public void handle(long now) {
@@ -75,7 +67,7 @@ public abstract class GameLoop {
         }.start();
     }
 
-    public abstract void initBackground();
+    public abstract void initBackground(Scene scence, Group componentsGroup);
 
     public void display() {
         stage.setScene(scene);

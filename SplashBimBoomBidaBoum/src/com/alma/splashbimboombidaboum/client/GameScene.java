@@ -1,5 +1,7 @@
 package com.alma.splashbimboombidaboum.client;
 
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -12,13 +14,10 @@ public class GameScene extends GameLoop {
 
     public GameScene(Stage primaryStage) throws InterruptedException {
         super(primaryStage);
-        super.stageWidth = 800;
-        super.stageHeight = 800;
     }
 
-
     @Override
-    public void initBackground() {
+    public void initBackground(Scene scene, Group componentsGroup) {
         Rectangle background = new Rectangle(scene.getWidth(),scene.getHeight());
         background.setFill(Color.web("#f49b00"));
         background.widthProperty().bind(scene.widthProperty());
