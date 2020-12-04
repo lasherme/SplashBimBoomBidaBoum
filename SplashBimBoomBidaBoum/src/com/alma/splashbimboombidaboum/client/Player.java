@@ -37,11 +37,11 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 		this.name = name;
 		Random r = new Random();
 		int port = (2000+r.nextInt(8000));
-		this.myAddress = "//" + PREADRRESS + ":" + port + "/" + PORT;
+		this.myAddress = "rmi://" + PREADRRESS + ":" + port + "/" + PORT;
 		LocateRegistry.createRegistry(port);
 		Naming.bind(myAddress,this);
 		//Player connection to server
-		this.server = (RoomReservationInterface) Naming.lookup("//" + PREADRRESS + ":" + PORT + "/" + POSTADDRESS);
+		this.server = (RoomReservationInterface) Naming.lookup("rmi://" + PREADRRESS + ":" + PORT + "/" + POSTADDRESS);
 		System.out.println("Connection established with server : \n\t" + this.server.toString());
 		this.room = server.getRoom(this);
 		System.out.println("Room joined : \n\t" + this.room.getId());
