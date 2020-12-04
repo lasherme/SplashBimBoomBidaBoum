@@ -45,7 +45,6 @@ public class Game implements Runnable {
                 for (PlayerInterface p : inGamePlayers) { //Sending models to players
                     try {
                         for(String s : characterMap.keySet()){
-
                             p.setCharacters(s,characterMap.get(s).getTranslateX(),characterMap.get(s).getTranslateY());
                         }
                     } catch (RemoteException e) {
@@ -63,8 +62,6 @@ public class Game implements Runnable {
                     //Creation des obstacles
                     if (new Random().nextInt(100) * 100 < 3 && obstacles.size() < 5) {
                         obstacles.add(new Obstacle());
-                        System.out.println(obstacles.size());
-
                     }
                     //Gestion de la partie
                     for (int i = 0; i < alive.size(); i++) {
@@ -140,10 +137,6 @@ public class Game implements Runnable {
                         RemoteException e) {
                     e.printStackTrace();
                 }
-
-
-
-
         /*
         TODO:
         INFORMER LES CLIENTS ET LEURS DONNER LE CLASSEMENT
