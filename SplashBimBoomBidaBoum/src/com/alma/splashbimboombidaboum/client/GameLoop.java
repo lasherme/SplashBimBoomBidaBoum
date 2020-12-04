@@ -38,26 +38,24 @@ public abstract class GameLoop {
                 System.exit(0);
             }
         });
-
         stage = primaryStage;
         root = new Group();
         componentsGroup = new Group();
         boundsGroup = new Group();
-        scene = new Scene(root, 800,744);
+        scene = new Scene(root, 800,800);
         initBackground();
         scene.setOnKeyPressed(onPressHandler);
         scene.setOnKeyReleased(onReleaseHandler);
         root.getChildren().add(componentsGroup);
         root.getChildren().add(boundsGroup);
         Main.player.setLiveGame(this);
-        HashMap<String, Character> oldpos = new HashMap<>();
         final Boolean[] firstFrame = {true};
         new AnimationTimer(){
             public void handle(long now) {
                 if(!Main.player.gameEnds && Main.player.getGamestarted()){
                     if(firstFrame[0]){
                         for(Character c : Main.player.characterMap.values()){
-                            componentsGroup.getChildren().add(c.mainChar);
+                            componentsGroup.getChildren().add(c.getMainChar());
                         }
                         firstFrame[0] = false;
                     }
@@ -96,10 +94,4 @@ public abstract class GameLoop {
             Main.player.setCurrentEvent(null);
         }
     };
-    public double getStageHeight(){
-        return this.stageHeight;
-    }
-    public double getStageWidth(){
-        return this.stageWidth;
-    }
 }
