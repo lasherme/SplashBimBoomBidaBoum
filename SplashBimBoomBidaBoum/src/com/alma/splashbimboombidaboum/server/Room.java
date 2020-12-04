@@ -62,7 +62,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface{
 
 	public void isReady(PlayerInterface player) throws RemoteException {
 		playerReadyStatus.put(player,!playerReadyStatus.get(player));
-		System.out.println("Someone's ready");
+		System.out.println(player.getName()+ "is ready");
 		if(readyCheck()){
 			ArrayList<String> playersInGame = new ArrayList<>();
 			for(PlayerInterface p : playerReadyStatus.keySet()){

@@ -1,5 +1,6 @@
 package com.alma.splashbimboombidaboum.client;
 
+import com.alma.splashbimboombidaboum.server.RoomInterface;
 import javafx.scene.input.KeyEvent;
 
 import java.rmi.Remote;
@@ -24,5 +25,6 @@ public interface PlayerInterface extends Remote{
 
     void setEnnemies(ArrayList<String> players) throws RemoteException;
 
-    void setObstacle(String id, double translateX, double translateY)throws RemoteException;
+    void setObstacle(String id, double translateX, double translateY) throws RemoteException;
+    void setRoom(RoomInterface ri) throws RemoteException;
 }

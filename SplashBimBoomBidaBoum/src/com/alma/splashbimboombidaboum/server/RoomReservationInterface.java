@@ -9,9 +9,9 @@ import com.alma.splashbimboombidaboum.client.PlayerInterface;
 
 public interface RoomReservationInterface extends Remote {
 	
-	public RoomInterface getRoom(PlayerInterface player) throws RemoteException, MalformedURLException, NotBoundException;
+	public void getRoom(PlayerInterface player) throws RemoteException, MalformedURLException, NotBoundException;
 	
-	public RoomInterface getRoom(PlayerInterface player, String id) throws RemoteException, MalformedURLException, NotBoundException;
+	public void getRoom(PlayerInterface player, String id) throws RemoteException, MalformedURLException, NotBoundException;
 
 
 }

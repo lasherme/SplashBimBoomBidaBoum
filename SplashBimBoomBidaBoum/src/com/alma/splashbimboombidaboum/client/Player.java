@@ -19,7 +19,7 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 
 	private String name;
 	private RoomReservationInterface server;
-	private RoomInterface room;
+	private RoomInterface room = null;
 	private String myAddress = null;
 	private KeyEvent currentEvent = null;
 	boolean deathStatus = false;
@@ -32,19 +32,20 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	Obstacle o;
 	HashMap<String, Character> characterMap = new HashMap<>();
 
+
 	public Player(String name) throws MalformedURLException, RemoteException, NotBoundException, AlreadyBoundException {
 		//Player Preparation
 		this.name = name;
 		Random r = new Random();
 		int port = (2000+r.nextInt(8000));
-		this.myAddress = "rmi://" + PREADRRESS + ":" + port + "/" + PORT;
+		this.myAddress = "rmi://" + "192.168.0.14" + ":" + port + "/" + PORT;
 		LocateRegistry.createRegistry(port);
 		Naming.bind(myAddress,this);
 		//Player connection to server
 		this.server = (RoomReservationInterface) Naming.lookup("rmi://" + PREADRRESS + ":" + PORT + "/" + POSTADDRESS);
-		System.out.println("Connection established with server : \n\t" + this.server.toString());
-		this.room = server.getRoom(this);
-		System.out.println("Room joined : \n\t" + this.room.getId());
+		//System.out.println("Connection established with server : \n\t" + this.server.toString());
+		server.getRoom(this);
+		System.out.println(room.getId());
 		System.out.println("Number of players in the room :"+ this.room.getSize());
 	}
 
@@ -126,8 +127,14 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 		}
 	}
 
+	@Override
+	public void setRoom(RoomInterface ri) {
+		this.room = ri;
+	}
+
 	public Boolean getGamestarted(){
 		return this.gamestarted;
 	}
+
 
 }

@@ -51,7 +51,6 @@ public abstract class GameLoop {
                         }
                         firstFrame[0] = false;
                     }
-                    System.out.println(Main.player.obstacles.size());
                     for(String o : Main.player.obstacles.keySet()){
                         if(!componentsGroup.getChildren().contains(Main.player.obstacles.get(o).getComponent())){
                             componentsGroup.getChildren().add(Main.player.obstacles.get(o).getComponent());
