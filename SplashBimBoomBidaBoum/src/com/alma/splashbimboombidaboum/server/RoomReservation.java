@@ -26,7 +26,6 @@ public class RoomReservation extends UnicastRemoteObject implements RoomReservat
 		RoomInterface currentRoom = null;
 
 		currentRoom = new Room(UUID.randomUUID().toString(), maxPlayer);
-		System.out.println(currentRoom.getId());
 		this.rooms.put(currentRoom.getId(), currentRoom);
 
 		return currentRoom;
@@ -38,13 +37,14 @@ public class RoomReservation extends UnicastRemoteObject implements RoomReservat
 
 		for (String roomId : this.rooms.keySet()) {
 			iterateRoom = this.rooms.get(roomId);
-			if (iterateRoom.getSize() + iterateRoom.getQueue() < iterateRoom.getMaxPlayer()) {
+			if (iterateRoom.getSize() + iterateRoom.getQueue() < iterateRoom.getMaxPlayer() && iterateRoom.getIsOpen()) {
 				currentRoom = iterateRoom.roomConnection(player);
+				break;
 			}
 		}
 		if (currentRoom == null) {
 			currentRoom = createRoom(4);
-			currentRoom.roomConnection(player);
+			currentRoom = currentRoom.roomConnection(player);
 		}
 
 		return currentRoom;
@@ -54,7 +54,7 @@ public class RoomReservation extends UnicastRemoteObject implements RoomReservat
 		RoomInterface currentRoom = null;
 
 		if ((currentRoom = this.rooms.get(roomId)) != null) {
-			if (currentRoom.getSize() + currentRoom.getQueue() < currentRoom.getMaxPlayer()) {
+			if (currentRoom.getSize() + currentRoom.getQueue() < currentRoom.getMaxPlayer() && currentRoom.getIsOpen()) {
 				currentRoom.roomConnection(player);
 			} else {
 				currentRoom = null;

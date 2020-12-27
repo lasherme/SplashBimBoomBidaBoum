@@ -6,14 +6,15 @@ import java.rmi.RemoteException;
 
 public class Main {
 
+	static {
+		System.out.println("Hello, I am the Server main !");
+	}
 	public static void main(String[] args) {
 		RoomReservationInterface server;
 		
-		System.out.println("Hello, I am the Server main !");
 		try {
 			server = new RoomReservation();
 		} catch (RemoteException | MalformedURLException | AlreadyBoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
