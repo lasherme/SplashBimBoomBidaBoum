@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.Group?>
 
-<StackPane xmlns:fx="http://javafx.com/fxml/1"
+<Group xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="com.alma.splashbimboombidaboum.client.controller.GameRoomController"
-	fx:id="pane">
-</StackPane>
+	fx:id="group">
+	<children>
+		<StackPane prefHeight="300" prefWidth="700"
+			fx:id="stackPane" onKeyPressed="#handleOnKeyPressed" onKeyReleased="#handleOnKeyReleased">
+			<children>
+			</children>
+		</StackPane>
+	</children>
+</Group>
 

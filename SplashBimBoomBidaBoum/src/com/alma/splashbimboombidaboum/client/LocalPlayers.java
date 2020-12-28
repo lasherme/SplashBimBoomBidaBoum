@@ -28,6 +28,16 @@ public class LocalPlayers extends UnicastRemoteObject implements LocalPlayersInt
 		this.players.remove(player);
 	}
 
+	public void changeCoordinatesPlayer(PlayerInterface player, float x, float y) throws RemoteException {
+		for (PlayerInterface currentPlayer : players) {
+			if (currentPlayer.getName().equals(player.getName())) {
+				currentPlayer.getCoordinates().setX(x);
+				currentPlayer.getCoordinates().setY(y);
+			}
+			break;
+		}
+	}
+
 	public void setState(PlayerInterface player, boolean ready) throws RemoteException {
 		for (PlayerInterface currentPlayer : players) {
 			if (currentPlayer.getName().equals(player.getName())) {

@@ -6,6 +6,9 @@ import java.util.ArrayList;
 
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
 import com.alma.splashbimboombidaboum.utility.Address;
+import com.alma.splashbimboombidaboum.utility.Direction;
+
+import javafx.scene.paint.Color;
 
 public class Room extends UnicastRemoteObject implements RoomInterface, Address {
 	private String id;
@@ -123,8 +126,60 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 	}
 
 	private void startGame() throws RemoteException {
+		this.initialization();
 		for (PlayerInterface player : players) {
 			player.getLocalPlayers().setGameStart(true);
 		}
+		this.game();
+	}
+
+	private void initialization() throws RemoteException {
+		float position = 0;
+		float size = 30;
+		float spacing = 20;
+
+		for (PlayerInterface player : players) {
+			player.setColor("#2bd0e0");
+			player.getCoordinates().setSize(size);
+			player.getCoordinates().setX(position);
+			player.getCoordinates().setY(20);
+
+			position += size + spacing;
+		}
+	}
+
+	private void game() throws RemoteException {
+		float speed = 5;
+
+		new Thread(() -> {
+			while (true) {
+				for (PlayerInterface player : players) {
+					try {
+						if (player.getCoordinates().getDirection() == Direction.RIGHT) {
+							player.getCoordinates().setX(player.getCoordinates().getX() + speed);
+						} else {
+							if (player.getCoordinates().getDirection() == Direction.LEFT) {
+								player.getCoordinates().setX(player.getCoordinates().getX() - speed);
+							}
+						}
+
+						for (PlayerInterface localPlayer : players) {
+							if (localPlayer != player) {
+								localPlayer.getLocalPlayers().changeCoordinatesPlayer(player,
+										player.getCoordinates().getX(), player.getCoordinates().getY());
+							}
+						}
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+				}
+
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 }

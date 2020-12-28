@@ -10,23 +10,41 @@ import com.alma.splashbimboombidaboum.server.RoomInterface;
 import com.alma.splashbimboombidaboum.server.RoomReservationInterface;
 import com.alma.splashbimboombidaboum.utility.Address;
 
+import javafx.application.Platform;
+import javafx.scene.paint.Color;
+
 public class Player extends UnicastRemoteObject implements PlayerInterface, Address {
 	private String name;
 	private boolean ready = false;
+	private Color color = Color.BLACK;
+	private CoordinatesInterface coord;
 	private LocalPlayersInterface players;
 	private RoomReservationInterface server;
 	private RoomInterface room;
 
 	public Player(String name) throws RemoteException {
 		this.name = name;
+		this.coord = new Coordinates();
 		this.players = new LocalPlayers();
 	}
-	
-	public boolean getState() throws RemoteException{
+
+	public boolean getState() throws RemoteException {
 		return this.ready;
 	}
-	
-	public void setState(boolean ready) throws RemoteException{
+
+	public String getColor() throws RemoteException {
+		return this.color.toString();
+	}
+
+	public void setColor(String color) throws RemoteException {
+		this.color = Color.web(color);
+	}
+
+	public CoordinatesInterface getCoordinates() throws RemoteException {
+		return this.coord;
+	}
+
+	public void setState(boolean ready) throws RemoteException {
 		this.ready = ready;
 	}
 

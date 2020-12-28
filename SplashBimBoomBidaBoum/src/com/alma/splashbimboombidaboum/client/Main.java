@@ -33,6 +33,7 @@ public class Main extends Application implements Address {
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("./resources/fxml/Main.fxml"));
 		Parent root = (Parent) fxmlLoader.load();
 		Scene scene = new Scene(root);
+		primaryStage.setResizable(false);
 		primaryStage.setTitle("SplashBimBoomBidaBoum");
 		primaryStage.setScene(scene);
 		primaryStage.show();

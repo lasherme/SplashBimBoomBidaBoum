@@ -14,9 +14,11 @@ public interface LocalPlayersInterface extends Remote {
 
 	public void removePlayer(PlayerInterface player) throws RemoteException;
 
+	public void changeCoordinatesPlayer(PlayerInterface player, float x, float y) throws RemoteException;
+
 	public void setState(PlayerInterface player, boolean ready) throws RemoteException;
 
 	public BooleanProperty getGameStart() throws RemoteException;
-	
+
 	public void setGameStart(boolean gameStart) throws RemoteException;
 }
