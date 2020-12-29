@@ -3,11 +3,14 @@ package com.alma.splashbimboombidaboum.server;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import com.alma.splashbimboombidaboum.client.Player;
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
 import com.alma.splashbimboombidaboum.utility.Address;
 import com.alma.splashbimboombidaboum.utility.Direction;
+import com.alma.splashbimboombidaboum.utility.MathVector;
+import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 import com.alma.splashbimboombidaboum.utility.PlayerColor;
 
 import javafx.scene.paint.Color;
@@ -69,10 +72,10 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 			for (PlayerInterface currentPlayer : players) {
 				currentPlayer.getLocalPlayers().removePlayer(player);
 			}
-				
+
 			PlayerColor colorBuffer = null;
-			for(PlayerColor color : colorsRemove) {
-				if(color.getPlayerColor().equals(player.getColor())) {
+			for (PlayerColor color : colorsRemove) {
+				if (color.getPlayerColor().equals(player.getColor())) {
 					colorBuffer = color;
 					break;
 				}
@@ -104,7 +107,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 			while (!checkName(player.getName())) {
 				player.setName(name + i++);
 			}
-			
+
 			// Give random color for the player
 			int randomColorIndex = (int) (Math.random() * colors.size());
 			PlayerColor randomColor = colors.get(randomColorIndex);
@@ -168,8 +171,8 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 		for (PlayerInterface player : players) {
 			player.setColor(player.getColor());
 			player.getCoordinates().setSize(size);
-			player.getCoordinates().setX(position);
-			player.getCoordinates().setY(20);
+			player.getCoordinates().getPositionVector().setVector(position, 0);
+			player.getCoordinates().getDirectionVector().setVector(0, 0);
 
 			position += size + spacing;
 		}
@@ -177,23 +180,69 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 
 	private void game() throws RemoteException {
 		float speed = 5;
+		MathVectorInterface gravityVector = new MathVector(0, (float) -9.81);
 
 		new Thread(() -> {
+
+			for (PlayerInterface player : players) {
+				new Thread(() -> {
+					while (true) {
+						MathVectorInterface vectorBuffer;
+						try {
+							vectorBuffer = new MathVector();
+							MathVectorInterface directionVector = new MathVector();
+							MathVectorInterface playerDirectionVector = player.getCoordinates().getDirectionVector();
+							MathVectorInterface playerPositionVector = player.getCoordinates().getPositionVector();
+
+							for (Direction direction : player.getCoordinates().getDirection()) {
+								switch (direction) {
+								case RIGHT:
+									directionVector = directionVector.sumVector(new MathVector(1, 0));
+									break;
+								case LEFT:
+									directionVector = directionVector.sumVector(new MathVector(-1, 0));
+									break;
+								case DOWN:
+									directionVector = directionVector.sumVector(new MathVector(0, -1));
+									break;
+								case UP:
+									if (playerPositionVector.getY() <= 0) {
+										directionVector = directionVector.sumVector(new MathVector(0, 50));
+									}
+									break;
+								default:
+									break;
+								}
+							}
+
+							vectorBuffer = directionVector.timeFloatVector(speed);
+							vectorBuffer = vectorBuffer.sumVector(gravityVector);
+							vectorBuffer = vectorBuffer.averageVector(playerDirectionVector);
+							playerDirectionVector.setVector(vectorBuffer.getX(), vectorBuffer.getY());
+
+							vectorBuffer = vectorBuffer.sumVector(playerPositionVector);
+							playerPositionVector.setVector(vectorBuffer.getX(), Math.max(0, vectorBuffer.getY()));
+						} catch (RemoteException e1) {
+							e1.printStackTrace();
+						}
+
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}).start();
+			}
 			while (true) {
 				for (PlayerInterface player : players) {
 					try {
-						if (player.getCoordinates().getDirection() == Direction.RIGHT) {
-							player.getCoordinates().setX(player.getCoordinates().getX() + speed);
-						} else {
-							if (player.getCoordinates().getDirection() == Direction.LEFT) {
-								player.getCoordinates().setX(player.getCoordinates().getX() - speed);
-							}
-						}
 
 						for (PlayerInterface localPlayer : players) {
 							if (localPlayer != player) {
 								localPlayer.getLocalPlayers().changeCoordinatesPlayer(player,
-										player.getCoordinates().getX(), player.getCoordinates().getY());
+										player.getCoordinates().getPositionVector().getX(),
+										player.getCoordinates().getPositionVector().getY());
 							}
 						}
 					} catch (RemoteException e) {

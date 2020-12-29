@@ -22,8 +22,6 @@ import javafx.scene.shape.Rectangle;
 
 public class GameRoomController implements Initializable {
 	@FXML
-	private Group group;
-	@FXML
 	private StackPane stackPane;
 	private Rectangle playerRectangle;
 	private Map<PlayerInterface, Rectangle> enemiesRectangle = new HashMap<PlayerInterface, Rectangle>();
@@ -35,16 +33,16 @@ public class GameRoomController implements Initializable {
 			for (PlayerInterface enemy : Main.player.getLocalPlayers().getPlayers()) {
 				Rectangle r = new Rectangle(enemy.getCoordinates().getWidth(), enemy.getCoordinates().getHeight(),
 						Color.web(enemy.getColor()));
-				r.setX(enemy.getCoordinates().getX());
-				r.setY(enemy.getCoordinates().getY());
+				r.setX(enemy.getCoordinates().getPositionVector().getX());
+				r.setY(enemy.getCoordinates().getPositionVector().getY());
 				enemiesRectangle.put(enemy, r);
 				stackPane.getChildren().add(r);
 			}
 
 			playerRectangle = new Rectangle(Main.player.getCoordinates().getWidth(),
 					Main.player.getCoordinates().getHeight(), Color.web(Main.player.getColor()));
-			playerRectangle.setX(Main.player.getCoordinates().getX());
-			playerRectangle.setY(Main.player.getCoordinates().getY());
+			playerRectangle.setX(Main.player.getCoordinates().getPositionVector().getX());
+			playerRectangle.setY(Main.player.getCoordinates().getPositionVector().getY());
 			stackPane.getChildren().add(playerRectangle);
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -60,16 +58,24 @@ public class GameRoomController implements Initializable {
 	protected void handleOnKeyPressed(KeyEvent e) throws IOException {
 		switch (e.getCode()) {
 		case Q:
-			Main.player.getCoordinates().setDirection(Direction.LEFT);
+			if (!Main.player.getCoordinates().getDirection().contains(Direction.LEFT)) {
+				Main.player.getCoordinates().addDirection(Direction.LEFT);
+			}
 			break;
 		case D:
-			Main.player.getCoordinates().setDirection(Direction.RIGHT);
+			if (!Main.player.getCoordinates().getDirection().contains(Direction.RIGHT)) {
+				Main.player.getCoordinates().addDirection(Direction.RIGHT);
+			}
 			break;
 		case Z:
-			Main.player.getCoordinates().setDirection(Direction.UP);
+			if (!Main.player.getCoordinates().getDirection().contains(Direction.UP)) {
+				Main.player.getCoordinates().addDirection(Direction.UP);
+			}
 			break;
 		case S:
-			Main.player.getCoordinates().setDirection(Direction.DOWN);
+			if (!Main.player.getCoordinates().getDirection().contains(Direction.DOWN)) {
+				Main.player.getCoordinates().addDirection(Direction.DOWN);
+			}
 			break;
 		default:
 			break;
@@ -78,7 +84,22 @@ public class GameRoomController implements Initializable {
 
 	@FXML
 	protected void handleOnKeyReleased(KeyEvent e) throws IOException {
-		Main.player.getCoordinates().setDirection(Direction.STAY);
+		switch (e.getCode()) {
+		case Q:
+			Main.player.getCoordinates().removeDirection(Direction.LEFT);
+			break;
+		case D:
+			Main.player.getCoordinates().removeDirection(Direction.RIGHT);
+			break;
+		case Z:
+			Main.player.getCoordinates().removeDirection(Direction.UP);
+			break;
+		case S:
+			Main.player.getCoordinates().removeDirection(Direction.DOWN);
+			break;
+		default:
+			break;
+		}
 	}
 
 	private void game() {
@@ -86,12 +107,12 @@ public class GameRoomController implements Initializable {
 		new Thread(() -> {
 			while (true) {
 				try {
-					playerRectangle.setTranslateX(Main.player.getCoordinates().getX());
-					playerRectangle.setTranslateY(Main.player.getCoordinates().getY());
+					playerRectangle.setTranslateX(Main.player.getCoordinates().getPositionVector().getX());
+					playerRectangle.setTranslateY(Main.player.getCoordinates().getPositionVector().getY());
 
 					for (PlayerInterface enemy : this.enemiesRectangle.keySet()) {
-						enemiesRectangle.get(enemy).setTranslateX(enemy.getCoordinates().getX());
-						enemiesRectangle.get(enemy).setTranslateY(enemy.getCoordinates().getY());
+						enemiesRectangle.get(enemy).setTranslateX(enemy.getCoordinates().getPositionVector().getX());
+						enemiesRectangle.get(enemy).setTranslateY(enemy.getCoordinates().getPositionVector().getY());
 					}
 				} catch (RemoteException e1) {
 					e1.printStackTrace();

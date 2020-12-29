@@ -9,6 +9,7 @@ import java.rmi.server.UnicastRemoteObject;
 import com.alma.splashbimboombidaboum.server.RoomInterface;
 import com.alma.splashbimboombidaboum.server.RoomReservationInterface;
 import com.alma.splashbimboombidaboum.utility.Address;
+import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 
 import javafx.application.Platform;
 import javafx.scene.paint.Color;

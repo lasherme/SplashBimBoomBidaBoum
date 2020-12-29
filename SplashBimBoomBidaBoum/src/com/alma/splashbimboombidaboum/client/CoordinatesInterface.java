@@ -2,24 +2,18 @@ package com.alma.splashbimboombidaboum.client;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 import com.alma.splashbimboombidaboum.utility.Direction;
+import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 
 public interface CoordinatesInterface extends Remote {
-
-	public float getX() throws RemoteException;
-
-	public float getY() throws RemoteException;
 
 	public float getHeight() throws RemoteException;
 
 	public float getWidth() throws RemoteException;
 
-	public Direction getDirection() throws RemoteException;
-
-	public void setX(float x) throws RemoteException;
-
-	public void setY(float y) throws RemoteException;
+	public ArrayList<Direction> getDirection() throws RemoteException;
 
 	public void setHeight(float height) throws RemoteException;
 
@@ -27,6 +21,12 @@ public interface CoordinatesInterface extends Remote {
 
 	public void setSize(float size) throws RemoteException;
 
-	public void setDirection(Direction direction) throws RemoteException;
+	public void addDirection(Direction direction) throws RemoteException;
+	
+	public void removeDirection(Direction direction) throws RemoteException;
+
+	public MathVectorInterface getPositionVector() throws RemoteException;
+
+	public MathVectorInterface getDirectionVector() throws RemoteException;
 
 }
