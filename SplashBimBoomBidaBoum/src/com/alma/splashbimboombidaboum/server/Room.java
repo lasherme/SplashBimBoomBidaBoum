@@ -4,9 +4,11 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
+import com.alma.splashbimboombidaboum.client.Player;
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
 import com.alma.splashbimboombidaboum.utility.Address;
 import com.alma.splashbimboombidaboum.utility.Direction;
+import com.alma.splashbimboombidaboum.utility.PlayerColor;
 
 import javafx.scene.paint.Color;
 
@@ -17,11 +19,17 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 	private ArrayList<PlayerInterface> players = new ArrayList<PlayerInterface>();
 	/** true when players can connect to this Room, false otherwise */
 	private boolean isOpen = false;
+	private ArrayList<PlayerColor> colors = new ArrayList<PlayerColor>();
+	private ArrayList<PlayerColor> colorsRemove = new ArrayList<PlayerColor>();
 
 	public Room(String id, int maxPlayer) throws RemoteException {
 		this.id = id;
 		this.maxPlayer = maxPlayer;
 		this.isOpen = true;
+
+		for (PlayerColor color : PlayerColor.values()) {
+			colors.add(color);
+		}
 
 		System.out.println("Room ID : " + this.id);
 	}
@@ -57,11 +65,22 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 
 		if (this.players.contains(player)) {
 			this.players.remove(player);
+
+			for (PlayerInterface currentPlayer : players) {
+				currentPlayer.getLocalPlayers().removePlayer(player);
+			}
+				
+			PlayerColor colorBuffer = null;
+			for(PlayerColor color : colorsRemove) {
+				if(color.getPlayerColor().equals(player.getColor())) {
+					colorBuffer = color;
+					break;
+				}
+			}
+			colorsRemove.remove(colorBuffer);
+			colors.add(colorBuffer);
 		}
 
-		for (PlayerInterface currentPlayer : players) {
-			currentPlayer.getLocalPlayers().removePlayer(player);
-		}
 	}
 
 	public RoomInterface roomConnection(PlayerInterface player) throws RemoteException {
@@ -85,6 +104,14 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 			while (!checkName(player.getName())) {
 				player.setName(name + i++);
 			}
+			
+			// Give random color for the player
+			int randomColorIndex = (int) (Math.random() * colors.size());
+			PlayerColor randomColor = colors.get(randomColorIndex);
+			player.setColor(randomColor.getPlayerColor());
+			colors.remove(randomColor);
+			colorsRemove.add(randomColor);
+
 			// Update players' waiting room with new player
 			for (PlayerInterface currentPlayer : players) {
 				currentPlayer.getLocalPlayers().addPlayer(player);
@@ -139,7 +166,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 		float spacing = 20;
 
 		for (PlayerInterface player : players) {
-			player.setColor("#2bd0e0");
+			player.setColor(player.getColor());
 			player.getCoordinates().setSize(size);
 			player.getCoordinates().setX(position);
 			player.getCoordinates().setY(20);
@@ -175,7 +202,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 				}
 
 				try {
-					Thread.sleep(50);
+					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

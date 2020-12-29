@@ -32,11 +32,6 @@ public class GameRoomController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 
 		try {
-			playerRectangle = new Rectangle(Main.player.getCoordinates().getWidth(),
-					Main.player.getCoordinates().getHeight(), Color.web(Main.player.getColor()));
-			playerRectangle.setX(Main.player.getCoordinates().getX());
-			playerRectangle.setY(Main.player.getCoordinates().getY());
-			stackPane.getChildren().add(playerRectangle);
 			for (PlayerInterface enemy : Main.player.getLocalPlayers().getPlayers()) {
 				Rectangle r = new Rectangle(enemy.getCoordinates().getWidth(), enemy.getCoordinates().getHeight(),
 						Color.web(enemy.getColor()));
@@ -45,6 +40,12 @@ public class GameRoomController implements Initializable {
 				enemiesRectangle.put(enemy, r);
 				stackPane.getChildren().add(r);
 			}
+
+			playerRectangle = new Rectangle(Main.player.getCoordinates().getWidth(),
+					Main.player.getCoordinates().getHeight(), Color.web(Main.player.getColor()));
+			playerRectangle.setX(Main.player.getCoordinates().getX());
+			playerRectangle.setY(Main.player.getCoordinates().getY());
+			stackPane.getChildren().add(playerRectangle);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -96,7 +97,7 @@ public class GameRoomController implements Initializable {
 					e1.printStackTrace();
 				}
 				try {
-					Thread.sleep(50);
+					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
