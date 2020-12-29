@@ -3,17 +3,15 @@ package com.alma.splashbimboombidaboum.server;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.Set;
 
-import com.alma.splashbimboombidaboum.client.Player;
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
 import com.alma.splashbimboombidaboum.utility.Address;
 import com.alma.splashbimboombidaboum.utility.Direction;
 import com.alma.splashbimboombidaboum.utility.MathVector;
 import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 import com.alma.splashbimboombidaboum.utility.PlayerColor;
-
-import javafx.scene.paint.Color;
+import com.alma.splashbimboombidaboum.utility.WindowSize;
 
 public class Room extends UnicastRemoteObject implements RoomInterface, Address {
 	private String id;
@@ -22,8 +20,10 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 	private ArrayList<PlayerInterface> players = new ArrayList<PlayerInterface>();
 	/** true when players can connect to this Room, false otherwise */
 	private boolean isOpen = false;
+	private boolean inGame = false;
 	private ArrayList<PlayerColor> colors = new ArrayList<PlayerColor>();
 	private ArrayList<PlayerColor> colorsRemove = new ArrayList<PlayerColor>();
+	private ArrayList<Thread> threads = new ArrayList<Thread>();
 
 	public Room(String id, int maxPlayer) throws RemoteException {
 		this.id = id;
@@ -39,6 +39,10 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 
 	public String getId() throws RemoteException {
 		return this.id;
+	}
+	
+	public boolean getInGame() throws RemoteException {
+		return this.inGame;
 	}
 
 	public int getMaxPlayer() throws RemoteException {
@@ -164,35 +168,46 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 	}
 
 	private void initialization() throws RemoteException {
+		inGame = true;
 		float position = 0;
-		float size = 30;
 		float spacing = 20;
 
 		for (PlayerInterface player : players) {
 			player.setColor(player.getColor());
-			player.getCoordinates().setSize(size);
+			player.getCoordinates().setSize(WindowSize.size);
 			player.getCoordinates().getPositionVector().setVector(position, 0);
 			player.getCoordinates().getDirectionVector().setVector(0, 0);
 
-			position += size + spacing;
+			position += WindowSize.size + spacing;
 		}
 	}
 
 	private void game() throws RemoteException {
-		float speed = 5;
-		MathVectorInterface gravityVector = new MathVector(0, (float) -9.81);
-
+		MathVectorInterface gravityVector = new MathVector(0, -8);
+		
+		new Thread(() -> {
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			inGame = false;
+		}).start();
+		
 		new Thread(() -> {
 
 			for (PlayerInterface player : players) {
-				new Thread(() -> {
-					while (true) {
+				Thread t = new Thread(() -> {
+					while (inGame) {
 						MathVectorInterface vectorBuffer;
 						try {
 							vectorBuffer = new MathVector();
 							MathVectorInterface directionVector = new MathVector();
 							MathVectorInterface playerDirectionVector = player.getCoordinates().getDirectionVector();
 							MathVectorInterface playerPositionVector = player.getCoordinates().getPositionVector();
+							float x;
+							float y;
 
 							for (Direction direction : player.getCoordinates().getDirection()) {
 								switch (direction) {
@@ -207,7 +222,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 									break;
 								case UP:
 									if (playerPositionVector.getY() <= 0) {
-										directionVector = directionVector.sumVector(new MathVector(0, 50));
+										directionVector = directionVector.sumVector(new MathVector(0, 30));
 									}
 									break;
 								default:
@@ -215,13 +230,15 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 								}
 							}
 
-							vectorBuffer = directionVector.timeFloatVector(speed);
+							vectorBuffer = directionVector.timeFloatVector(WindowSize.speed);
 							vectorBuffer = vectorBuffer.sumVector(gravityVector);
 							vectorBuffer = vectorBuffer.averageVector(playerDirectionVector);
 							playerDirectionVector.setVector(vectorBuffer.getX(), vectorBuffer.getY());
 
 							vectorBuffer = vectorBuffer.sumVector(playerPositionVector);
-							playerPositionVector.setVector(vectorBuffer.getX(), Math.max(0, vectorBuffer.getY()));
+							x = Math.min(vectorBuffer.getX() + WindowSize.size, WindowSize.width) - WindowSize.size;
+							y = Math.min(vectorBuffer.getY() + WindowSize.size, WindowSize.height) - WindowSize.size;
+							playerPositionVector.setVector(Math.max(0, x), Math.max(0, y));
 						} catch (RemoteException e1) {
 							e1.printStackTrace();
 						}
@@ -232,9 +249,11 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 							e.printStackTrace();
 						}
 					}
-				}).start();
+				});
+				threads.add(t);
+				t.start();
 			}
-			while (true) {
+			while (inGame) {
 				for (PlayerInterface player : players) {
 					try {
 
@@ -256,6 +275,23 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 					e.printStackTrace();
 				}
 			}
+			boolean b = true;
+			while (b) {
+				b = false;
+				for (Thread t : threads) {
+					if(t.isAlive()) {
+						b = true;
+					}
+				}
+			}
+			this.refresh();
 		}).start();
+
+	}
+	
+	private void refresh() {
+		this.isOpen = true;
+		this.inGame = false;
+		threads = new ArrayList<Thread>();
 	}
 }

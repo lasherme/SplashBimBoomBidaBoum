@@ -9,9 +9,8 @@ import java.rmi.server.UnicastRemoteObject;
 import com.alma.splashbimboombidaboum.server.RoomInterface;
 import com.alma.splashbimboombidaboum.server.RoomReservationInterface;
 import com.alma.splashbimboombidaboum.utility.Address;
-import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 
-import javafx.application.Platform;
+import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 
 public class Player extends UnicastRemoteObject implements PlayerInterface, Address {
@@ -22,11 +21,20 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	private LocalPlayersInterface players;
 	private RoomReservationInterface server;
 	private RoomInterface room;
+	private Scene scene;
 
 	public Player(String name) throws RemoteException {
 		this.name = name;
 		this.coord = new Coordinates();
 		this.players = new LocalPlayers();
+	}
+
+	public Scene getScene() throws RemoteException {
+		return this.scene;
+	}
+
+	public void setScene(Scene scene) throws RemoteException {
+		this.scene = scene;
 	}
 
 	public boolean getState() throws RemoteException {

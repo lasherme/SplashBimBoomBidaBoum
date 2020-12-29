@@ -10,15 +10,20 @@ import java.util.ResourceBundle;
 import com.alma.splashbimboombidaboum.client.Main;
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
 import com.alma.splashbimboombidaboum.utility.Direction;
+import com.alma.splashbimboombidaboum.utility.WindowSize;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 
 public class GameRoomController implements Initializable {
 	@FXML
@@ -28,6 +33,8 @@ public class GameRoomController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		stackPane.setPrefHeight(WindowSize.height);
+		stackPane.setPrefWidth(WindowSize.width);
 
 		try {
 			for (PlayerInterface enemy : Main.player.getLocalPlayers().getPlayers()) {
@@ -105,8 +112,8 @@ public class GameRoomController implements Initializable {
 	private void game() {
 
 		new Thread(() -> {
-			while (true) {
-				try {
+			try {
+				while (Main.player.getRoom().getInGame()) {
 					playerRectangle.setTranslateX(Main.player.getCoordinates().getPositionVector().getX());
 					playerRectangle.setTranslateY(Main.player.getCoordinates().getPositionVector().getY());
 
@@ -114,15 +121,26 @@ public class GameRoomController implements Initializable {
 						enemiesRectangle.get(enemy).setTranslateX(enemy.getCoordinates().getPositionVector().getX());
 						enemiesRectangle.get(enemy).setTranslateY(enemy.getCoordinates().getPositionVector().getY());
 					}
-				} catch (RemoteException e1) {
-					e1.printStackTrace();
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
+
+			Platform.runLater(() -> {
 				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) {
+					Parent root = FXMLLoader.load(getClass().getResource("../resources/fxml/ScoreBoard.fxml"));
+					Stage stage = (Stage) this.stackPane.getScene().getWindow();
+					stage.setScene(new Scene(root));
+					stage.show();
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			}
+			});
 		}).start();
 	}
 }

@@ -37,7 +37,9 @@ public class PlayMenuController implements Initializable {
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../resources/fxml/WaitingRoom.fxml"));
 		Parent root = (Parent) fxmlLoader.load();
 		Stage stage = (Stage) this.mainVBox.getScene().getWindow();
-		stage.setScene(new Scene(root));
+		Scene scene = new Scene(root);
+		Main.player.setScene(scene);
+		stage.setScene(scene);
 		stage.show();
 	}
 

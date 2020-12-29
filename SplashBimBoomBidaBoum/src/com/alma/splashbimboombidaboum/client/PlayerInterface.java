@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import com.alma.splashbimboombidaboum.server.RoomInterface;
 import com.alma.splashbimboombidaboum.server.RoomReservationInterface;
 
+import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 
 public interface PlayerInterface extends Remote {
@@ -19,6 +20,10 @@ public interface PlayerInterface extends Remote {
 	public void setColor(String color) throws RemoteException;
 
 	public String getColor() throws RemoteException;
+
+	public Scene getScene() throws RemoteException;
+
+	public void setScene(Scene scene) throws RemoteException;
 
 	public CoordinatesInterface getCoordinates() throws RemoteException;
 
