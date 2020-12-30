@@ -23,7 +23,12 @@
 			</children>
 		</HBox>
 		<Button text="Leave room" onAction="#handleLeaveButtonAction" />
-		<Label fx:id="roomLabel" />
+		<HBox spacing="5">
+			<children>
+				<Label fx:id="roomLabel" />
+				<Button text="Copy" onAction="#handleCopyButtonAction" />
+			</children>
+		</HBox>
 	</children>
 </VBox>
 

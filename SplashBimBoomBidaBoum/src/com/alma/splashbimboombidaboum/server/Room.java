@@ -40,7 +40,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 	public String getId() throws RemoteException {
 		return this.id;
 	}
-	
+
 	public boolean getInGame() throws RemoteException {
 		return this.inGame;
 	}
@@ -59,6 +59,10 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 
 	public boolean getIsOpen() throws RemoteException {
 		return this.isOpen;
+	}
+
+	public ArrayList<PlayerInterface> getPlayers() throws RemoteException {
+		return this.players;
 	}
 
 	public void setMaxPlayer(int maxPlayer) {
@@ -87,7 +91,6 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 			colorsRemove.remove(colorBuffer);
 			colors.add(colorBuffer);
 		}
-
 	}
 
 	public RoomInterface roomConnection(PlayerInterface player) throws RemoteException {
@@ -118,11 +121,11 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 			player.setColor(randomColor.getPlayerColor());
 			colors.remove(randomColor);
 			colorsRemove.add(randomColor);
+			System.out.println(randomColor);
 
 			// Update players' waiting room with new player
 			for (PlayerInterface currentPlayer : players) {
 				currentPlayer.getLocalPlayers().addPlayer(player);
-				player.getLocalPlayers().addPlayer(currentPlayer);
 			}
 			this.players.add(player);
 			currentRoom = this;
@@ -184,17 +187,16 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 
 	private void game() throws RemoteException {
 		MathVectorInterface gravityVector = new MathVector(0, -8);
-		
+
 		new Thread(() -> {
 			try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			inGame = false;
 		}).start();
-		
+
 		new Thread(() -> {
 
 			for (PlayerInterface player : players) {
@@ -279,7 +281,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 			while (b) {
 				b = false;
 				for (Thread t : threads) {
-					if(t.isAlive()) {
+					if (t.isAlive()) {
 						b = true;
 					}
 				}
@@ -288,10 +290,18 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 		}).start();
 
 	}
-	
+
 	private void refresh() {
 		this.isOpen = true;
 		this.inGame = false;
+
+		try {
+			for (PlayerInterface player : players) {
+				player.setState(false);
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		threads = new ArrayList<Thread>();
 	}
 }

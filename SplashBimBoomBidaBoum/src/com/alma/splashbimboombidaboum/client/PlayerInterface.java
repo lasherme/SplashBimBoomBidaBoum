@@ -17,6 +17,8 @@ public interface PlayerInterface extends Remote {
 
 	public void setState(boolean ready) throws RemoteException;
 
+	public void createLocalPlayers() throws RemoteException;
+
 	public void setColor(String color) throws RemoteException;
 
 	public String getColor() throws RemoteException;
@@ -42,5 +44,7 @@ public interface PlayerInterface extends Remote {
 	public RoomReservationInterface connection() throws MalformedURLException, RemoteException, NotBoundException;
 
 	public RoomInterface roomConnection() throws RemoteException;
+
+	public RoomInterface roomConnection(String id) throws RemoteException;
 
 }

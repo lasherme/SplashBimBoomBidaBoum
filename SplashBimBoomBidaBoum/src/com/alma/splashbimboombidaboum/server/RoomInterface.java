@@ -2,6 +2,7 @@ package com.alma.splashbimboombidaboum.server;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
 
@@ -12,6 +13,8 @@ public interface RoomInterface extends Remote {
 	public int getMaxPlayer() throws RemoteException;
 
 	public int getQueue() throws RemoteException;
+
+	public ArrayList<PlayerInterface> getPlayers() throws RemoteException;
 
 	public int getSize() throws RemoteException;
 

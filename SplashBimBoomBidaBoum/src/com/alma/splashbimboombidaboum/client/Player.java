@@ -17,6 +17,7 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	private String name;
 	private boolean ready = false;
 	private Color color = Color.BLACK;
+	private String colorString = "";
 	private CoordinatesInterface coord;
 	private LocalPlayersInterface players;
 	private RoomReservationInterface server;
@@ -26,6 +27,9 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	public Player(String name) throws RemoteException {
 		this.name = name;
 		this.coord = new Coordinates();
+	}
+
+	public void createLocalPlayers() throws RemoteException {
 		this.players = new LocalPlayers();
 	}
 
@@ -42,11 +46,12 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	}
 
 	public String getColor() throws RemoteException {
-		return this.color.toString();
+		return this.colorString;
 	}
 
 	public void setColor(String color) throws RemoteException {
 		this.color = Color.web(color);
+		this.colorString = color;
 	}
 
 	public CoordinatesInterface getCoordinates() throws RemoteException {

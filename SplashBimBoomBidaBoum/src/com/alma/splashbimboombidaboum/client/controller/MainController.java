@@ -1,7 +1,9 @@
 package com.alma.splashbimboombidaboum.client.controller;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ResourceBundle;
 
@@ -27,13 +29,13 @@ public class MainController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		try {			
+		try {
 			playerName.setText(Main.player.getName());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@FXML
 	protected void handlePlayButtonAction(ActionEvent e) throws IOException {
 		Main.player.setName(this.playerName.getText());
@@ -42,13 +44,11 @@ public class MainController implements Initializable {
 		stage.setScene(new Scene(root));
 		stage.show();
 	}
-	
+
 	@FXML
 	protected void handleExitButtonAction(ActionEvent e) {
 		Platform.exit();
 		System.exit(0);
 	}
-	
-	
 
 }

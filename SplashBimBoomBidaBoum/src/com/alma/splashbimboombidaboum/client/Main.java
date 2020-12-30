@@ -1,5 +1,7 @@
 package com.alma.splashbimboombidaboum.client;
 
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import com.alma.splashbimboombidaboum.client.controller.MainController;
@@ -19,7 +21,8 @@ public class Main extends Application implements Address {
 		// System.out.println("Hello, I am the Client main !");
 		try {
 			player = new Player("Boomer");
-		} catch (RemoteException e) {
+			Main.player.connection();
+		} catch (RemoteException | MalformedURLException | NotBoundException e) {
 			e.printStackTrace();
 		}
 	}

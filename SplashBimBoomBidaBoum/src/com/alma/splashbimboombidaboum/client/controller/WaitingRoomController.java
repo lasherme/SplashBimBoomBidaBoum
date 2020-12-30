@@ -1,5 +1,7 @@
 package com.alma.splashbimboombidaboum.client.controller;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -14,7 +16,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -61,6 +62,7 @@ public class WaitingRoomController implements Initializable {
 				if (newValue) {
 					Platform.runLater(() -> {
 						try {
+							Main.player.getLocalPlayers().setGameStart(false);
 							Parent root = FXMLLoader.load(getClass().getResource("../resources/fxml/GameRoom.fxml"));
 							Stage stage = (Stage) this.mainVBox.getScene().getWindow();
 							stage.setScene(new Scene(root));
@@ -71,7 +73,12 @@ public class WaitingRoomController implements Initializable {
 					});
 				}
 			});
-			Main.player.roomConnection();
+			for (PlayerInterface player : Main.player.getRoom().getPlayers()) {
+				if (!player.getName().equals(Main.player.getName())) {
+					Main.player.getLocalPlayers().addPlayer(player);
+				}
+			}
+
 			this.playerLabel.setText(Main.player.getName());
 			roomLabel.setText("Room ID : " + Main.player.getRoom().getId());
 		} catch (
@@ -109,6 +116,13 @@ public class WaitingRoomController implements Initializable {
 				e1.printStackTrace();
 			}
 		});
+	}
+
+	@FXML
+	protected void handleCopyButtonAction(ActionEvent e) throws IOException {
+		String roomId = roomLabel.getText();
+		roomId = roomId.substring(10);
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(roomId), null);
 	}
 
 	private void addPlayer(PlayerInterface player) {

@@ -14,8 +14,8 @@
 		<Button text="Join Random" onAction="#handleJoinRandomButtonAction"/>
 		<HBox>
 			<children>
-				<Button text="Join with ID" />
-				<TextField />
+				<Button text="Join with ID" onAction="#handleJoinWithIDButtonAction"/>
+				<TextField fx:id="idRoomLabel"/>
 			</children>
 		</HBox>
 		<Button text="Return" onAction="#handleReturnButtonAction"/>

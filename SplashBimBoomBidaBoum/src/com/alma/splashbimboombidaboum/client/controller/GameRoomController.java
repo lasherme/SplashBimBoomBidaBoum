@@ -130,7 +130,11 @@ public class GameRoomController implements Initializable {
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 			}
-
+			try {
+				Main.player.getCoordinates().getDirection().clear();
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
 			Platform.runLater(() -> {
 				try {
 					Parent root = FXMLLoader.load(getClass().getResource("../resources/fxml/ScoreBoard.fxml"));
