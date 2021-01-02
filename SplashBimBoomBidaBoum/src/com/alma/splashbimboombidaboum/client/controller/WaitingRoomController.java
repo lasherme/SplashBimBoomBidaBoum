@@ -76,7 +76,7 @@ public class WaitingRoomController implements Initializable {
 			});
 			Main.player.getLocalPlayers().getReady()
 					.addListener((MapChangeListener<PlayerInterface, Boolean>) change -> {
-						System.out.println("prout");
+						
 					});
 			
 			

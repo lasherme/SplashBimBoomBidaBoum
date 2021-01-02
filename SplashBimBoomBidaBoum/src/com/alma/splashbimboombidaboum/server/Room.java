@@ -11,8 +11,8 @@ import com.alma.splashbimboombidaboum.utility.Address;
 import com.alma.splashbimboombidaboum.utility.Direction;
 import com.alma.splashbimboombidaboum.utility.MathVector;
 import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
-import com.alma.splashbimboombidaboum.utility.Obstacle;
-import com.alma.splashbimboombidaboum.utility.ObstacleInterface;
+import com.alma.splashbimboombidaboum.utility.ObstacleEntity;
+import com.alma.splashbimboombidaboum.utility.ObstacleEntityInterface;
 import com.alma.splashbimboombidaboum.utility.PlayerColor;
 import com.alma.splashbimboombidaboum.utility.WindowSize;
 import com.sun.media.jfxmediaimpl.platform.osx.OSXPlatform;
@@ -28,7 +28,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 	private boolean inGame = false;
 	private ArrayList<PlayerColor> colors = new ArrayList<PlayerColor>();
 	private ArrayList<PlayerColor> colorsRemove = new ArrayList<PlayerColor>();
-	private CopyOnWriteArrayList<ObstacleInterface> obstacles = new CopyOnWriteArrayList<ObstacleInterface>();
+	private CopyOnWriteArrayList<ObstacleEntityInterface> obstacles = new CopyOnWriteArrayList<ObstacleEntityInterface>();
 	private ArrayList<PlayerInterface> deads = new ArrayList<PlayerInterface>();
 
 	public Room(String id, int maxPlayer, RoomReservationInterface roomReservation) throws RemoteException {
@@ -97,8 +97,8 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 			}
 			colorsRemove.remove(colorBuffer);
 			colors.add(colorBuffer);
-			
-			if(players.size() <= 0) {
+
+			if (players.size() <= 0) {
 				this.roomReservation.removeRoom(this);
 			}
 		}
@@ -197,8 +197,8 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 		for (PlayerInterface player : players) {
 			player.setColor(player.getColor());
 			player.getCoordinates().setSize(WindowSize.size);
-			player.getCoordinates().getPositionVector().setVector(position, 0);
-			player.getCoordinates().getDirectionVector().setVector(0, 0);
+			player.getCoordinates().getPosition().setVector(position, 0);
+			player.getCoordinates().getDirection().setVector(0, 0);
 
 			position += WindowSize.size + spacing;
 		}
@@ -216,12 +216,12 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 						try {
 							vectorBuffer = new MathVector();
 							MathVectorInterface directionVector = new MathVector();
-							MathVectorInterface playerDirectionVector = player.getCoordinates().getDirectionVector();
-							MathVectorInterface playerPositionVector = player.getCoordinates().getPositionVector();
+							MathVectorInterface playerDirectionVector = player.getCoordinates().getDirection();
+							MathVectorInterface playerPositionVector = player.getCoordinates().getPosition();
 							float x;
 							float y;
 
-							for (Direction direction : player.getCoordinates().getDirection()) {
+							for (Direction direction : player.getCoordinates().getKeyDirection()) {
 								switch (direction) {
 								case RIGHT:
 									directionVector = directionVector.sumVector(new MathVector(1, 0));
@@ -242,7 +242,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 								}
 							}
 
-							vectorBuffer = directionVector.timeFloatVector(WindowSize.speed);
+							vectorBuffer = directionVector.factorVector(WindowSize.speed);
 							vectorBuffer = vectorBuffer.sumVector(gravityVector);
 							vectorBuffer = vectorBuffer.averageVector(playerDirectionVector);
 							playerDirectionVector.setVector(vectorBuffer.getX(), vectorBuffer.getY());
@@ -274,13 +274,13 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 							for (PlayerInterface localPlayer : players) {
 								if (localPlayer != player) {
 									localPlayer.getLocalPlayers().changeCoordinatesPlayer(player,
-											player.getCoordinates().getPositionVector().getX(),
-											player.getCoordinates().getPositionVector().getY());
+											player.getCoordinates().getPosition().getX(),
+											player.getCoordinates().getPosition().getY());
 								}
 
 							}
 
-							for (ObstacleInterface obstacle : obstacles) {
+							for (ObstacleEntityInterface obstacle : obstacles) {
 								if (obstacle.collision(player)) {
 									deads.add(player);
 									for (PlayerInterface localPlayer : players) {
@@ -288,9 +288,9 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 									}
 
 									if (deads.size() >= players.size() - 1) {
-										for(PlayerInterface currentPlayer : players) {
-											if(!deads.contains(currentPlayer)) {
-												for(PlayerInterface p : players) {
+										for (PlayerInterface currentPlayer : players) {
+											if (!deads.contains(currentPlayer)) {
+												for (PlayerInterface p : players) {
 													p.getLocalPlayers().addDead(currentPlayer);
 												}
 												break;
@@ -322,8 +322,8 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 
 			while (inGame) {
 				try {
-					ObstacleInterface obstacle = new Obstacle(20, 20, i++, new MathVector(WindowSize.width, 0),
-							new MathVector(-1, 0));
+					ObstacleEntityInterface obstacle = new ObstacleEntity(20, 20, new MathVector(WindowSize.width, 0),
+							new MathVector(-1, 0), i++);
 					obstacles.add(obstacle);
 					for (PlayerInterface player : players) {
 						player.getLocalPlayers().addObstacle(obstacle);
@@ -346,14 +346,14 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 			float speed = 2;
 
 			while (inGame) {
-				for (ObstacleInterface obstacle : obstacles) {
+				for (ObstacleEntityInterface obstacle : obstacles) {
 					try {
 						if (obstacle.getPosition().getX() + obstacle.getWidth() < 0) {
 							for (PlayerInterface player : players) {
 								player.getLocalPlayers().removeObstacle(obstacle);
 							}
 						} else {
-							vecteur = obstacle.getPosition().sumVector(obstacle.getDirection().timeFloatVector(speed));
+							vecteur = obstacle.getPosition().sumVector(obstacle.getDirection().factorVector(speed));
 							obstacle.getPosition().setVector(vecteur.getX(), vecteur.getY());
 						}
 					} catch (RemoteException e) {
@@ -375,7 +375,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 		this.isOpen = true;
 		this.inGame = false;
 
-		obstacles = new CopyOnWriteArrayList<ObstacleInterface>();
+		obstacles = new CopyOnWriteArrayList<ObstacleEntityInterface>();
 		deads = new ArrayList<PlayerInterface>();
 	}
 }

@@ -31,9 +31,9 @@ public interface PlayerInterface extends Remote {
 
 	public void setWaitingRoom(WaitingRoomController waitingRoom) throws RemoteException;
 
-	public CoordinatesInterface getCoordinates() throws RemoteException;
+	public PlayerEntityInterface getCoordinates() throws RemoteException;
 
-	public LocalPlayersInterface getLocalPlayers() throws RemoteException;
+	public ObservableDataInterface getLocalPlayers() throws RemoteException;
 
 	public RoomReservationInterface getServer() throws RemoteException;
 

@@ -3,7 +3,7 @@ package com.alma.splashbimboombidaboum.client;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import com.alma.splashbimboombidaboum.utility.ObstacleInterface;
+import com.alma.splashbimboombidaboum.utility.ObstacleEntityInterface;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -15,31 +15,29 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
-public class LocalPlayers extends UnicastRemoteObject implements LocalPlayersInterface {
-	private ObservableList<PlayerInterface> players;
-	private ObservableList<PlayerInterface> deads;
-	private ObservableList<ObstacleInterface> obstacles;
-	private ObservableMap<PlayerInterface, Boolean> ready;
+public class ObservableData extends UnicastRemoteObject implements ObservableDataInterface {
+	private ObservableList<PlayerInterface> players = FXCollections.observableArrayList();
+	private ObservableList<ObstacleEntityInterface> obstacles = FXCollections.observableArrayList();
+	private ObservableList<PlayerInterface> deads = FXCollections.observableArrayList();
 	private BooleanProperty gameStart = new SimpleBooleanProperty(false);
+	private ObservableMap<PlayerInterface, Boolean> ready;
 
-	public LocalPlayers() throws RemoteException {
-		this.players = FXCollections.observableArrayList();
-		this.obstacles = FXCollections.observableArrayList();
-		this.deads = FXCollections.observableArrayList();
+	public ObservableData() throws RemoteException {
 		this.ready = FXCollections.observableHashMap();
 	}
 
 	public ObservableList<PlayerInterface> getPlayers() throws RemoteException {
 		return this.players;
 	}
+	
+	public ObservableList<ObstacleEntityInterface> getObstacle() throws RemoteException {
+		return this.obstacles;
+	}
 
 	public ObservableList<PlayerInterface> getDeads() throws RemoteException {
 		return this.deads;
 	}
 
-	public ObservableList<ObstacleInterface> getObstacle() throws RemoteException {
-		return this.obstacles;
-	}
 
 	public ObservableMap<PlayerInterface, Boolean> getReady() throws RemoteException {
 		return this.ready;
@@ -54,15 +52,14 @@ public class LocalPlayers extends UnicastRemoteObject implements LocalPlayersInt
 	}
 
 	public void addDead(PlayerInterface player) throws RemoteException {
-		System.out.println(player.getName());
 		this.deads.add(player);
 	}
 
-	public void addObstacle(ObstacleInterface obstacle) throws RemoteException {
+	public void addObstacle(ObstacleEntityInterface obstacle) throws RemoteException {
 		this.obstacles.add(obstacle);
 	}
 
-	public void removeObstacle(ObstacleInterface obstacle) throws RemoteException {
+	public void removeObstacle(ObstacleEntityInterface obstacle) throws RemoteException {
 		this.obstacles.remove(obstacle);
 	}
 
@@ -78,8 +75,8 @@ public class LocalPlayers extends UnicastRemoteObject implements LocalPlayersInt
 	public void changeCoordinatesPlayer(PlayerInterface player, float x, float y) throws RemoteException {
 		for (PlayerInterface currentPlayer : players) {
 			if (currentPlayer.getName().equals(player.getName())) {
-				currentPlayer.getCoordinates().getPositionVector().setX(x);
-				currentPlayer.getCoordinates().getPositionVector().setY(y);
+				currentPlayer.getCoordinates().getPosition().setX(x);
+				currentPlayer.getCoordinates().getPosition().setY(y);
 			}
 			break;
 		}

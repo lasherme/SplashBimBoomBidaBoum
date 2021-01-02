@@ -17,9 +17,12 @@ public class MathVector extends UnicastRemoteObject implements MathVectorInterfa
 		this.y = y;
 	}
 
-	public void setVector(float x, float y) throws RemoteException {
-		this.x = x;
-		this.y = y;
+	public float getX() throws RemoteException {
+		return this.x;
+	}
+
+	public float getY() throws RemoteException {
+		return this.y;
 	}
 
 	public void setX(float x) throws RemoteException {
@@ -30,26 +33,17 @@ public class MathVector extends UnicastRemoteObject implements MathVectorInterfa
 		this.y = y;
 	}
 
-	public float getX() throws RemoteException {
-		return this.x;
-	}
-
-	public float getY() throws RemoteException {
-		return this.y;
+	public void setVector(float x, float y) throws RemoteException {
+		this.setX(x);
+		this.setY(y);
 	}
 
 	public MathVectorInterface sumVector(MathVectorInterface vector) throws RemoteException {
-		MathVectorInterface vectorBuffer = new MathVector();
-		vectorBuffer.setVector(this.getX() + vector.getX(), this.getY() + vector.getY());
-
-		return vectorBuffer;
+		return new MathVector(this.getX() + vector.getX(), this.getY() + vector.getY());
 	}
 
-	public MathVectorInterface timeFloatVector(float real) throws RemoteException {
-		MathVectorInterface vectorBuffer = new MathVector();
-		vectorBuffer.setVector(this.getX() * real, this.getY() * real);
-
-		return vectorBuffer;
+	public MathVectorInterface factorVector(float real) throws RemoteException {
+		return new MathVector(this.getX() * real, this.getY() * real);
 	}
 
 	public MathVectorInterface averageVector(MathVectorInterface vector) throws RemoteException {

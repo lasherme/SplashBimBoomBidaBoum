@@ -10,7 +10,7 @@ import java.util.ResourceBundle;
 import com.alma.splashbimboombidaboum.client.Main;
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
 import com.alma.splashbimboombidaboum.utility.Direction;
-import com.alma.splashbimboombidaboum.utility.ObstacleInterface;
+import com.alma.splashbimboombidaboum.utility.ObstacleEntityInterface;
 import com.alma.splashbimboombidaboum.utility.WindowSize;
 
 import javafx.application.Platform;
@@ -31,7 +31,7 @@ public class GameRoomController implements Initializable {
 	private StackPane stackPane;
 	private Rectangle playerRectangle;
 	private Map<PlayerInterface, Rectangle> enemiesRectangle = new HashMap<PlayerInterface, Rectangle>();
-	private Map<ObstacleInterface, Rectangle> obstacles = new HashMap<ObstacleInterface, Rectangle>();
+	private Map<ObstacleEntityInterface, Rectangle> obstacles = new HashMap<ObstacleEntityInterface, Rectangle>();
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -40,7 +40,7 @@ public class GameRoomController implements Initializable {
 
 		try {
 			Main.player.getLocalPlayers().getObstacle()
-					.addListener((ListChangeListener.Change<? extends ObstacleInterface> change) -> {
+					.addListener((ListChangeListener.Change<? extends ObstacleEntityInterface> change) -> {
 						while (change.next()) {
 							if (change.wasAdded()) {
 								change.getAddedSubList().forEach(value -> {
@@ -64,16 +64,16 @@ public class GameRoomController implements Initializable {
 			for (PlayerInterface enemy : Main.player.getLocalPlayers().getPlayers()) {
 				Rectangle r = new Rectangle(enemy.getCoordinates().getWidth(), enemy.getCoordinates().getHeight(),
 						Color.web(enemy.getColor()));
-				r.setX(enemy.getCoordinates().getPositionVector().getX());
-				r.setY(enemy.getCoordinates().getPositionVector().getY());
+				r.setX(enemy.getCoordinates().getPosition().getX());
+				r.setY(enemy.getCoordinates().getPosition().getY());
 				enemiesRectangle.put(enemy, r);
 				stackPane.getChildren().add(r);
 			}
 
 			playerRectangle = new Rectangle(Main.player.getCoordinates().getWidth(),
 					Main.player.getCoordinates().getHeight(), Color.web(Main.player.getColor()));
-			playerRectangle.setX(Main.player.getCoordinates().getPositionVector().getX());
-			playerRectangle.setY(Main.player.getCoordinates().getPositionVector().getY());
+			playerRectangle.setX(Main.player.getCoordinates().getPosition().getX());
+			playerRectangle.setY(Main.player.getCoordinates().getPosition().getY());
 			stackPane.getChildren().add(playerRectangle);
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -89,23 +89,23 @@ public class GameRoomController implements Initializable {
 	protected void handleOnKeyPressed(KeyEvent e) throws IOException {
 		switch (e.getCode()) {
 		case Q:
-			if (!Main.player.getCoordinates().getDirection().contains(Direction.LEFT)) {
-				Main.player.getCoordinates().addDirection(Direction.LEFT);
+			if (!Main.player.getCoordinates().getKeyDirection().contains(Direction.LEFT)) {
+				Main.player.getCoordinates().addKeyDirection(Direction.LEFT);
 			}
 			break;
 		case D:
-			if (!Main.player.getCoordinates().getDirection().contains(Direction.RIGHT)) {
-				Main.player.getCoordinates().addDirection(Direction.RIGHT);
+			if (!Main.player.getCoordinates().getKeyDirection().contains(Direction.RIGHT)) {
+				Main.player.getCoordinates().addKeyDirection(Direction.RIGHT);
 			}
 			break;
 		case Z:
-			if (!Main.player.getCoordinates().getDirection().contains(Direction.UP)) {
-				Main.player.getCoordinates().addDirection(Direction.UP);
+			if (!Main.player.getCoordinates().getKeyDirection().contains(Direction.UP)) {
+				Main.player.getCoordinates().addKeyDirection(Direction.UP);
 			}
 			break;
 		case S:
-			if (!Main.player.getCoordinates().getDirection().contains(Direction.DOWN)) {
-				Main.player.getCoordinates().addDirection(Direction.DOWN);
+			if (!Main.player.getCoordinates().getKeyDirection().contains(Direction.DOWN)) {
+				Main.player.getCoordinates().addKeyDirection(Direction.DOWN);
 			}
 			break;
 		default:
@@ -117,16 +117,16 @@ public class GameRoomController implements Initializable {
 	protected void handleOnKeyReleased(KeyEvent e) throws IOException {
 		switch (e.getCode()) {
 		case Q:
-			Main.player.getCoordinates().removeDirection(Direction.LEFT);
+			Main.player.getCoordinates().removeKeyDirection(Direction.LEFT);
 			break;
 		case D:
-			Main.player.getCoordinates().removeDirection(Direction.RIGHT);
+			Main.player.getCoordinates().removeKeyDirection(Direction.RIGHT);
 			break;
 		case Z:
-			Main.player.getCoordinates().removeDirection(Direction.UP);
+			Main.player.getCoordinates().removeKeyDirection(Direction.UP);
 			break;
 		case S:
-			Main.player.getCoordinates().removeDirection(Direction.DOWN);
+			Main.player.getCoordinates().removeKeyDirection(Direction.DOWN);
 			break;
 		default:
 			break;
@@ -141,8 +141,8 @@ public class GameRoomController implements Initializable {
 					Platform.runLater(() -> {
 						try {
 							if (stackPane.getChildren().contains(playerRectangle)) {
-								playerRectangle.setTranslateX(Main.player.getCoordinates().getPositionVector().getX());
-								playerRectangle.setTranslateY(Main.player.getCoordinates().getPositionVector().getY());
+								playerRectangle.setTranslateX(Main.player.getCoordinates().getPosition().getX());
+								playerRectangle.setTranslateY(Main.player.getCoordinates().getPosition().getY());
 							}
 						} catch (RemoteException e) {
 							e.printStackTrace();
@@ -153,17 +153,15 @@ public class GameRoomController implements Initializable {
 						Platform.runLater(() -> {
 
 							try {
-								enemiesRectangle.get(enemy)
-										.setTranslateX(enemy.getCoordinates().getPositionVector().getX());
-								enemiesRectangle.get(enemy)
-										.setTranslateY(enemy.getCoordinates().getPositionVector().getY());
+								enemiesRectangle.get(enemy).setTranslateX(enemy.getCoordinates().getPosition().getX());
+								enemiesRectangle.get(enemy).setTranslateY(enemy.getCoordinates().getPosition().getY());
 							} catch (RemoteException e) {
 								e.printStackTrace();
 							}
 						});
 					}
 
-					for (ObstacleInterface obstacle : this.obstacles.keySet()) {
+					for (ObstacleEntityInterface obstacle : this.obstacles.keySet()) {
 						Platform.runLater(() -> {
 							try {
 								obstacles.get(obstacle).setTranslateX(obstacle.getPosition().getX());
@@ -183,7 +181,7 @@ public class GameRoomController implements Initializable {
 				e1.printStackTrace();
 			}
 			try {
-				Main.player.getCoordinates().getDirection().clear();
+				Main.player.getCoordinates().getKeyDirection().clear();
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 			}
@@ -200,7 +198,7 @@ public class GameRoomController implements Initializable {
 		}).start();
 	}
 
-	private void addObstacle(ObstacleInterface obstacle) {
+	private void addObstacle(ObstacleEntityInterface obstacle) {
 		try {
 			Rectangle obstacleRectangle = new Rectangle(obstacle.getPosition().getX(), obstacle.getPosition().getY(),
 					obstacle.getWidth(), obstacle.getHeight());
@@ -214,7 +212,7 @@ public class GameRoomController implements Initializable {
 		}
 	}
 
-	private void removeObstacle(ObstacleInterface obstacle) {
+	private void removeObstacle(ObstacleEntityInterface obstacle) {
 		Platform.runLater(() -> {
 			obstacles.remove(obstacle);
 		});
