@@ -22,3 +22,4 @@ Pour lancer le jeu, il suffit de lancer le main du serveur avant de lancer le ma
 * Le répertoir du client : [Client](SplashBimBoomBidaBoum/src/com/alma/splashbimboombidaboum/client)
 * Le Main du serveur : [Serveur Main](SplashBimBoomBidaBoum/src/com/alma/splashbimboombidaboum/server/Main.java)
 * Le Main du client : [Client Main](SplashBimBoomBidaBoum/src/com/alma/splashbimboombidaboum/client/Main.java)
+* La Javadoc qui sert de rapport : [Javadoc](SplashBimBoomBidaBoum/doc)
