@@ -9,7 +9,7 @@ Notre projet consiste à la création d'un jeu multijoueur. Le but de notre jeu 
 Pour ce faire, nous avons intégralement développé notre jeu en java. Autant la partie client que serveur. Nous avons donc créé un unique projet java qui regroupe 2 packages distincts. L'un est un package pour le serveur et le second pour les clients. L'avantage de cela, est le fait que nous n'avons pas à recopier les interfaces de communication de chaque côté, car les client/serveur se trouvent dans le même projet. De lpus, l'interface graphique des clients a été réalisée à l'aide de JavaFX.
 
 ## Organisation du projet :
-* Le répertoire du serveur : [Serveur](SplashBimBoomBidaBoum/src/com/alma/splashbimboombidaboum/client)
-* Le répertoir du client :
-* Le Main du serveur :
-* Le Main du client : 
+* Le répertoire du serveur : [Serveur](SplashBimBoomBidaBoum/src/com/alma/splashbimboombidaboum/server)
+* Le répertoir du client : [Client](SplashBimBoomBidaBoum/src/com/alma/splashbimboombidaboum/client)
+* Le Main du serveur : [Serveur Main](SplashBimBoomBidaBoum/src/com/alma/splashbimboombidaboum/server/Main.java)
+* Le Main du client : [Client Main](SplashBimBoomBidaBoum/src/com/alma/splashbimboombidaboum/client/Main.java)
