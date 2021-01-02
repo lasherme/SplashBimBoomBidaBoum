@@ -6,8 +6,10 @@ import java.rmi.RemoteException;
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
 
 public interface RoomReservationInterface extends Remote {
-	
+
 	public RoomInterface getRoom(PlayerInterface player) throws RemoteException;
-	
+
 	public RoomInterface getRoom(PlayerInterface player, String roomId) throws RemoteException;
+
+	public void removeRoom(RoomInterface room) throws RemoteException;
 }

@@ -10,13 +10,14 @@ import java.util.ResourceBundle;
 import com.alma.splashbimboombidaboum.client.Main;
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
 import com.alma.splashbimboombidaboum.utility.Direction;
+import com.alma.splashbimboombidaboum.utility.ObstacleInterface;
 import com.alma.splashbimboombidaboum.utility.WindowSize;
 
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
@@ -30,6 +31,7 @@ public class GameRoomController implements Initializable {
 	private StackPane stackPane;
 	private Rectangle playerRectangle;
 	private Map<PlayerInterface, Rectangle> enemiesRectangle = new HashMap<PlayerInterface, Rectangle>();
+	private Map<ObstacleInterface, Rectangle> obstacles = new HashMap<ObstacleInterface, Rectangle>();
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -37,6 +39,28 @@ public class GameRoomController implements Initializable {
 		stackPane.setPrefWidth(WindowSize.width);
 
 		try {
+			Main.player.getLocalPlayers().getObstacle()
+					.addListener((ListChangeListener.Change<? extends ObstacleInterface> change) -> {
+						while (change.next()) {
+							if (change.wasAdded()) {
+								change.getAddedSubList().forEach(value -> {
+									addObstacle(value);
+								});
+							}
+						}
+					});
+
+			Main.player.getLocalPlayers().getDeads()
+					.addListener((ListChangeListener.Change<? extends PlayerInterface> change) -> {
+						while (change.next()) {
+							if (change.wasAdded()) {
+								change.getAddedSubList().forEach(value -> {
+									killPlayer(value);
+								});
+							}
+						}
+					});
+
 			for (PlayerInterface enemy : Main.player.getLocalPlayers().getPlayers()) {
 				Rectangle r = new Rectangle(enemy.getCoordinates().getWidth(), enemy.getCoordinates().getHeight(),
 						Color.web(enemy.getColor()));
@@ -114,15 +138,43 @@ public class GameRoomController implements Initializable {
 		new Thread(() -> {
 			try {
 				while (Main.player.getRoom().getInGame()) {
-					playerRectangle.setTranslateX(Main.player.getCoordinates().getPositionVector().getX());
-					playerRectangle.setTranslateY(Main.player.getCoordinates().getPositionVector().getY());
+					Platform.runLater(() -> {
+						try {
+							if (stackPane.getChildren().contains(playerRectangle)) {
+								playerRectangle.setTranslateX(Main.player.getCoordinates().getPositionVector().getX());
+								playerRectangle.setTranslateY(Main.player.getCoordinates().getPositionVector().getY());
+							}
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
+					});
 
 					for (PlayerInterface enemy : this.enemiesRectangle.keySet()) {
-						enemiesRectangle.get(enemy).setTranslateX(enemy.getCoordinates().getPositionVector().getX());
-						enemiesRectangle.get(enemy).setTranslateY(enemy.getCoordinates().getPositionVector().getY());
+						Platform.runLater(() -> {
+
+							try {
+								enemiesRectangle.get(enemy)
+										.setTranslateX(enemy.getCoordinates().getPositionVector().getX());
+								enemiesRectangle.get(enemy)
+										.setTranslateY(enemy.getCoordinates().getPositionVector().getY());
+							} catch (RemoteException e) {
+								e.printStackTrace();
+							}
+						});
+					}
+
+					for (ObstacleInterface obstacle : this.obstacles.keySet()) {
+						Platform.runLater(() -> {
+							try {
+								obstacles.get(obstacle).setTranslateX(obstacle.getPosition().getX());
+								obstacles.get(obstacle).setTranslateY(obstacle.getPosition().getY());
+							} catch (RemoteException e) {
+								e.printStackTrace();
+							}
+						});
 					}
 					try {
-						Thread.sleep(10);
+						Thread.sleep(20);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -146,5 +198,41 @@ public class GameRoomController implements Initializable {
 				}
 			});
 		}).start();
+	}
+
+	private void addObstacle(ObstacleInterface obstacle) {
+		try {
+			Rectangle obstacleRectangle = new Rectangle(obstacle.getPosition().getX(), obstacle.getPosition().getY(),
+					obstacle.getWidth(), obstacle.getHeight());
+			obstacleRectangle.setFill(Color.BLACK);
+			Platform.runLater(() -> {
+				stackPane.getChildren().add(obstacleRectangle);
+				obstacles.put(obstacle, obstacleRectangle);
+			});
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void removeObstacle(ObstacleInterface obstacle) {
+		Platform.runLater(() -> {
+			obstacles.remove(obstacle);
+		});
+	}
+
+	private void killPlayer(PlayerInterface player) {
+		try {
+			if (Main.player.getName().equals(player.getName())) {
+				Platform.runLater(() -> {
+					stackPane.getChildren().remove(playerRectangle);
+				});
+			} else {
+				Platform.runLater(() -> {
+					stackPane.getChildren().remove(enemiesRectangle.get(player));
+				});
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 }

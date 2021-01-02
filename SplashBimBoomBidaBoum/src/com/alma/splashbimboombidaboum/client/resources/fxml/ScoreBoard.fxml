@@ -9,7 +9,10 @@
 	fx:id="mainVBox">
 	<children>
 		<Label text="Scoreboard :" />
-
+		<VBox fx:id="playersVBox">
+			<children>
+			</children>
+		</VBox>
 		<Button text="Return" onAction="#handleReturnButtonAction" />
 	</children>
 </VBox>

@@ -6,6 +6,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import com.alma.splashbimboombidaboum.client.controller.WaitingRoomController;
 import com.alma.splashbimboombidaboum.server.RoomInterface;
 import com.alma.splashbimboombidaboum.server.RoomReservationInterface;
 import com.alma.splashbimboombidaboum.utility.Address;
@@ -23,6 +24,7 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	private RoomReservationInterface server;
 	private RoomInterface room;
 	private Scene scene;
+	private WaitingRoomController waitingRoom;
 
 	public Player(String name) throws RemoteException {
 		this.name = name;
@@ -31,6 +33,14 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 
 	public void createLocalPlayers() throws RemoteException {
 		this.players = new LocalPlayers();
+	}
+	
+	public WaitingRoomController getWaitingRoom() throws RemoteException {
+		return this.waitingRoom;
+	}
+
+	public void setWaitingRoom(WaitingRoomController waitingRoom) throws RemoteException {
+		this.waitingRoom = waitingRoom;
 	}
 
 	public Scene getScene() throws RemoteException {

@@ -36,7 +36,7 @@ public class PlayMenuController implements Initializable {
 
 	@FXML
 	protected void handleJoinRandomButtonAction(ActionEvent e) throws IOException {
-		if (Main.player.roomConnection() != null) { // ici bug
+		if (Main.player.roomConnection() != null) {
 			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../resources/fxml/WaitingRoom.fxml"));
 			Parent root = (Parent) fxmlLoader.load();
 			Stage stage = (Stage) this.mainVBox.getScene().getWindow();

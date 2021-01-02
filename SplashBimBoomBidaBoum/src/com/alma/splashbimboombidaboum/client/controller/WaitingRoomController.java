@@ -12,6 +12,7 @@ import com.alma.splashbimboombidaboum.client.PlayerInterface;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -73,11 +74,21 @@ public class WaitingRoomController implements Initializable {
 					});
 				}
 			});
+			Main.player.getLocalPlayers().getReady()
+					.addListener((MapChangeListener<PlayerInterface, Boolean>) change -> {
+						System.out.println("prout");
+					});
+			
+			
+			
+			
 			for (PlayerInterface player : Main.player.getRoom().getPlayers()) {
 				if (!player.getName().equals(Main.player.getName())) {
 					Main.player.getLocalPlayers().addPlayer(player);
 				}
 			}
+
+			Main.player.setWaitingRoom(this);
 
 			this.playerLabel.setText(Main.player.getName());
 			roomLabel.setText("Room ID : " + Main.player.getRoom().getId());

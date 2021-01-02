@@ -5,11 +5,11 @@ import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import com.alma.splashbimboombidaboum.client.controller.WaitingRoomController;
 import com.alma.splashbimboombidaboum.server.RoomInterface;
 import com.alma.splashbimboombidaboum.server.RoomReservationInterface;
 
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
 
 public interface PlayerInterface extends Remote {
 
@@ -26,6 +26,10 @@ public interface PlayerInterface extends Remote {
 	public Scene getScene() throws RemoteException;
 
 	public void setScene(Scene scene) throws RemoteException;
+
+	public WaitingRoomController getWaitingRoom() throws RemoteException;
+
+	public void setWaitingRoom(WaitingRoomController waitingRoom) throws RemoteException;
 
 	public CoordinatesInterface getCoordinates() throws RemoteException;
 

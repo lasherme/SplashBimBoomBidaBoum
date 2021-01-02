@@ -9,8 +9,6 @@ import com.alma.splashbimboombidaboum.utility.MathVector;
 import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 
 public class Coordinates extends UnicastRemoteObject implements CoordinatesInterface {
-	private float x;
-	private float y;
 	private MathVectorInterface positionVector;
 	private MathVectorInterface directionVector;
 	private float height;
