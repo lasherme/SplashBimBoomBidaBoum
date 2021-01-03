@@ -11,13 +11,21 @@ import com.alma.splashbimboombidaboum.utility.Direction;
 import com.alma.splashbimboombidaboum.utility.InGameValues;
 import com.alma.splashbimboombidaboum.utility.MathVector;
 import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
-import com.alma.splashbimboombidaboum.utility.ObstacleEntity;
-import com.alma.splashbimboombidaboum.utility.ObstacleEntityInterface;
 import com.alma.splashbimboombidaboum.utility.PlayerColor;
 import com.alma.splashbimboombidaboum.utility.WindowSize;
 
 /**
+ * <b>Classe représentant le lobby.</b>
+ * <p>
+ * Elle peut être aussi utilisée comme objet distant.
+ * </p>
+ * <p>
+ * Voir {@link RoomInterface} pour plus de renseignements.
+ * </p>
  * 
+ * @see Address
+ * @see InGameValues
+ * @see WindowSize
  * @author Éloi Filaudeau, Louis Boursier, Nicolas Hawa, Loïc Lasherme
  * @version 1.0
  */
@@ -131,50 +139,67 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address,
 			colorsRemain.add(color);
 		}
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getId() throws RemoteException {
 		return this.id;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getMaxPlayer() throws RemoteException {
 		return this.maxPlayer;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getQueue() throws RemoteException {
 		return this.queue;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean getInGame() throws RemoteException {
 		return this.inGame;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public ArrayList<PlayerInterface> getPlayers() throws RemoteException {
 		return this.players;
 	}
 
-	/*
-	 * 
-	 * 
-	 * 
+	/**
+	 * {@inheritDoc}
 	 */
-
-	public void setMaxPlayer(int maxPlayer) {
+	public void setMaxPlayer(int maxPlayer) throws RemoteException {
 
 		if (maxPlayer > 1 && this.players.size() > maxPlayer) {
 			this.maxPlayer = maxPlayer;
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void removePlayer(PlayerInterface player) throws RemoteException {
+		PlayerColor colorBuffer = null;
 
 		if (this.players.contains(player)) {
 			this.players.remove(player);
 
+			// On supprime le joueur de l'affichage des autres joueurs
 			for (PlayerInterface currentPlayer : players) {
 				currentPlayer.getObservablePlayers().removePlayer(player);
 			}
 
-			PlayerColor colorBuffer = null;
+			// On remet la couleur du joueur dans les couleurs restantes.
 			for (PlayerColor color : colorsRemove) {
 				if (color.getPlayerColor().equals(player.getColor())) {
 					colorBuffer = color;
@@ -184,62 +209,16 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address,
 			colorsRemove.remove(colorBuffer);
 			colorsRemain.add(colorBuffer);
 
+			// S'il n'y a plus de joueur présent dans le lobby, nous le supprimons.
 			if (players.size() <= 0) {
 				this.roomReservation.removeRoom(this);
 			}
 		}
 	}
 
-	public RoomInterface roomConnection(PlayerInterface player) throws RemoteException {
-		RoomInterface currentRoom = null;
-
-		queue++;
-		currentRoom = roomConnectionBis(player);
-		queue--;
-
-		return currentRoom;
-	}
-
-	private synchronized RoomInterface roomConnectionBis(PlayerInterface player) throws RemoteException {
-		RoomInterface currentRoom = null;
-		int i;
-		String name = player.getName();
-
-		if (this.players.size() < maxPlayer) {
-			i = 1;
-			// Create unique name in the room if 2 player have the same.
-			while (!checkName(player.getName())) {
-				player.setName(name + i++);
-			}
-
-			// Give random color for the player.
-			int randomColorIndex = (int) (Math.random() * colorsRemain.size());
-			PlayerColor randomColor = colorsRemain.get(randomColorIndex);
-			player.setColor(randomColor.getPlayerColor());
-			colorsRemain.remove(randomColor);
-			colorsRemove.add(randomColor);
-
-			// Update players' waiting room with new player.
-			for (PlayerInterface currentPlayer : players) {
-				currentPlayer.getObservablePlayers().addPlayer(player);
-			}
-			this.players.add(player);
-			currentRoom = this;
-		}
-
-		return currentRoom;
-	}
-
-	private boolean checkName(String name) throws RemoteException {
-		for (PlayerInterface player : players) {
-			if (player.getName().equals(name)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	public void changeState(PlayerInterface player, boolean ready) throws RemoteException {
 		int nbReady = 0;
 
@@ -252,95 +231,270 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address,
 			}
 		}
 
+		// On lance la partie si tous les joueurs sont prêt et qu'il n'y a pas qu'un
+		// seul joueur.
 		if (nbReady == this.getPlayers().size() && nbReady > 1) {
 			inGame = true;
 			this.startGame();
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public RoomInterface roomConnection(PlayerInterface player) throws RemoteException {
+		RoomInterface currentRoom = null;
+
+		queue++;
+		currentRoom = roomConnectionBis(player);
+		queue--;
+
+		return currentRoom;
+	}
+
+	/**
+	 * Retourne ce lobby s'il y a toujours de la place. Stocke le joueur passé en
+	 * paramètre dans la liste des joueurs et lui attribut une couleur
+	 * aléatoirement.
+	 * 
+	 * @param player Le joueur qui veut se connecter dans le lobby.
+	 * @return Ce lobby s'il y a de la place, null sinon.
+	 * @throws RemoteException
+	 * @see Room#roomConnection(PlayerInterface)
+	 * @see PlayerInterface
+	 */
+	private synchronized RoomInterface roomConnectionBis(PlayerInterface player) throws RemoteException {
+		RoomInterface currentRoom = null;
+		int i;
+		String name = player.getName();
+
+		if (this.players.size() < maxPlayer) {
+			i = 1;
+			// Crée un nom unique si deux joueurs on le même pseudo.
+			while (!checkName(player.getName())) {
+				player.setName(name + i++);
+			}
+
+			// Attribut une couleur aléatoire au joueur.
+			int randomColorIndex = (int) (Math.random() * colorsRemain.size());
+			PlayerColor randomColor = colorsRemain.get(randomColorIndex);
+			player.setColor(randomColor.getPlayerColor());
+			colorsRemain.remove(randomColor);
+			colorsRemove.add(randomColor);
+
+			// Ajoute le joueur passé en paramètre à la liste d'attente des autres joueurs
+			// présent dans le lobby.
+			for (PlayerInterface currentPlayer : players) {
+				currentPlayer.getObservablePlayers().addPlayer(player);
+			}
+			this.players.add(player);
+			currentRoom = this;
+		}
+
+		return currentRoom;
+	}
+
+	/**
+	 * Permet de savoir si le pseudo passé en paramètre appartient déjà à un joueur
+	 * présent dans le lobby.
+	 * 
+	 * @param name Un pseudo.
+	 * @return true si le pseudo n'existe pas, false sinon.
+	 * @throws RemoteException
+	 * @see PlayerInterface
+	 */
+	private boolean checkName(String name) throws RemoteException {
+		for (PlayerInterface player : players) {
+			if (player.getName().equals(name)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Permet d'initialiser le lobby afin de pouvoir lancer la partie ensuite.
+	 * 
+	 * @throws RemoteException
+	 * @see Room#initialization()
+	 * @see Room#game()
+	 */
 	private void startGame() throws RemoteException {
 		this.initialization();
 		for (PlayerInterface player : players) {
 			player.getObservablePlayers().setGameStart(true);
 		}
+		this.playerDeplacementThread();
+		this.generationObstacleThread();
+		this.obstaclesDeplacementThread();
 		this.game();
 	}
 
+	/**
+	 * Initialise toutes les valeurs afin de bien commencer la partie.
+	 * 
+	 * @throws RemoteException
+	 */
 	private void initialization() throws RemoteException {
 		float position = 0;
-		float spacing = 20;
 
 		for (PlayerInterface player : players) {
 			player.setColor(player.getColor());
-			player.getCoordinates().setSize(SIZE);
-			player.getCoordinates().getPosition().setVector(position, 0);
-			player.getCoordinates().getDirection().setVector(0, 0);
+			player.getPlayerEntity().setSize(SIZE);
+			player.getPlayerEntity().getPosition().setVector(position, 0);
+			player.getPlayerEntity().getDirection().setVector(0, 0);
 
-			position += SIZE + spacing;
+			position += SIZE + SPACING;
 		}
 	}
 
+	/**
+	 * Permet de créer un thread qui gère le déplacement des joueurs dans la partie.
+	 * 
+	 * @throws RemoteException
+	 * @see MathVectorInterface
+	 * @see PlayerInterface
+	 */
+	private void playerDeplacementThread() throws RemoteException {
+		MathVectorInterface gravityVector = new MathVector(GRAVITY_X, GRAVITY_Y);
+
+		for (PlayerInterface player : players) {
+			new Thread(() -> {
+				while (inGame && !deads.contains(player)) {
+					MathVectorInterface vectorBuffer;
+					try {
+						vectorBuffer = new MathVector();
+						MathVectorInterface directionVector = new MathVector();
+						MathVectorInterface playerDirectionVector = player.getPlayerEntity().getDirection();
+						MathVectorInterface playerPositionVector = player.getPlayerEntity().getPosition();
+						float x;
+						float y;
+
+						// Regarde dans quel direction se déplace le joueur.
+						for (Direction direction : player.getPlayerEntity().getKeyDirection()) {
+							switch (direction) {
+							case RIGHT:
+								directionVector = directionVector.sumVector(new MathVector(1, 0));
+								break;
+							case LEFT:
+								directionVector = directionVector.sumVector(new MathVector(-1, 0));
+								break;
+							case DOWN:
+								directionVector = directionVector.sumVector(new MathVector(0, -1));
+								break;
+							case UP:
+								if (playerPositionVector.getY() <= 0) {
+									directionVector = directionVector.sumVector(new MathVector(0, 30));
+								}
+								break;
+							default:
+								break;
+							}
+						}
+
+						// Met à jour le vecteur direction du joueur en local.
+						vectorBuffer = directionVector.factorVector(PLAYER_SPEED);
+						vectorBuffer = vectorBuffer.sumVector(gravityVector);
+						vectorBuffer = vectorBuffer.averageVector(playerDirectionVector);
+						playerDirectionVector.setVector(vectorBuffer.getX(), vectorBuffer.getY());
+
+						// Met à jour le vecteur position du joueur en local.
+						vectorBuffer = vectorBuffer.sumVector(playerPositionVector);
+						x = Math.min(vectorBuffer.getX() + SIZE, WIDTH) - SIZE;
+						y = Math.min(vectorBuffer.getY() + SIZE, HEIGHT) - SIZE;
+						playerPositionVector.setVector(Math.max(0, x), Math.max(0, y));
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+
+					try {
+						Thread.sleep(GAME_REFRESHEMENT);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
+		}
+	}
+
+	/**
+	 * Permet de créer un thread qui gère la génération des obstacles de la partie.
+	 * 
+	 * @see MathVectorInterface
+	 * @see ObstacleEntityInterface
+	 * @see PlayerInterface
+	 */
+	private void generationObstacleThread() {
+		new Thread(() -> {
+			int i = 0;
+
+			while (inGame) {
+				try {
+					ObstacleEntityInterface obstacle = new ObstacleEntity(20, 20, new MathVector(WIDTH, 0),
+							new MathVector(-1, 0), i++);
+					obstacles.add(obstacle);
+					for (PlayerInterface player : players) {
+						player.getObservablePlayers().addObstacle(obstacle);
+					}
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+
+				try {
+					Thread.sleep(OBSTACLE_REFRESHEMENT);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
+	}
+
+	/**
+	 * Permet de créer un thread qui gère le déplacement des obstacles dans la
+	 * partie.
+	 * 
+	 * @see MathVectorInterface
+	 * @see ObstacleEntityInterface
+	 */
+	private void obstaclesDeplacementThread() {
+		new Thread(() -> {
+			MathVectorInterface vecteur;
+
+			while (inGame) {
+				for (ObstacleEntityInterface obstacle : obstacles) {
+					try {
+						if (obstacle.getPosition().getX() + obstacle.getWidth() < 0) {
+							for (PlayerInterface player : players) {
+								player.getObservablePlayers().removeObstacle(obstacle);
+							}
+						} else {
+							vecteur = obstacle.getPosition()
+									.sumVector(obstacle.getDirection().factorVector(OBSTACLE_SPEED));
+							obstacle.getPosition().setVector(vecteur.getX(), vecteur.getY());
+						}
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+
+				}
+				try {
+					Thread.sleep(GAME_REFRESHEMENT);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
+	}
+
+	/**
+	 * La méthode principale qui permet de faire tourner la partie comme il faut.
+	 * 
+	 * @throws RemoteException
+	 */
 	private void game() throws RemoteException {
-		MathVectorInterface gravityVector = new MathVector(0, -5);
 
 		new Thread(() -> {
-
-			for (PlayerInterface player : players) {
-				new Thread(() -> {
-					while (inGame && !deads.contains(player)) {
-						MathVectorInterface vectorBuffer;
-						try {
-							vectorBuffer = new MathVector();
-							MathVectorInterface directionVector = new MathVector();
-							MathVectorInterface playerDirectionVector = player.getCoordinates().getDirection();
-							MathVectorInterface playerPositionVector = player.getCoordinates().getPosition();
-							float x;
-							float y;
-
-							for (Direction direction : player.getCoordinates().getKeyDirection()) {
-								switch (direction) {
-								case RIGHT:
-									directionVector = directionVector.sumVector(new MathVector(1, 0));
-									break;
-								case LEFT:
-									directionVector = directionVector.sumVector(new MathVector(-1, 0));
-									break;
-								case DOWN:
-									directionVector = directionVector.sumVector(new MathVector(0, -1));
-									break;
-								case UP:
-									if (playerPositionVector.getY() <= 0) {
-										directionVector = directionVector.sumVector(new MathVector(0, 30));
-									}
-									break;
-								default:
-									break;
-								}
-							}
-
-							vectorBuffer = directionVector.factorVector(SPEED);
-							vectorBuffer = vectorBuffer.sumVector(gravityVector);
-							vectorBuffer = vectorBuffer.averageVector(playerDirectionVector);
-							playerDirectionVector.setVector(vectorBuffer.getX(), vectorBuffer.getY());
-
-							vectorBuffer = vectorBuffer.sumVector(playerPositionVector);
-							x = Math.min(vectorBuffer.getX() + SIZE, WIDTH) - SIZE;
-							y = Math.min(vectorBuffer.getY() + SIZE, HEIGHT) - SIZE;
-
-							playerPositionVector.setVector(Math.max(0, x), Math.max(0, y));
-						} catch (RemoteException e1) {
-							e1.printStackTrace();
-						}
-
-						try {
-							Thread.sleep(20);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}).start();
-
-			}
 
 			while (inGame) {
 				for (PlayerInterface player : players) {
@@ -350,8 +504,8 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address,
 							for (PlayerInterface localPlayer : players) {
 								if (localPlayer != player) {
 									localPlayer.getObservablePlayers().changeCoordinatesPlayer(player,
-											player.getCoordinates().getPosition().getX(),
-											player.getCoordinates().getPosition().getY());
+											player.getPlayerEntity().getPosition().getX(),
+											player.getPlayerEntity().getPosition().getY());
 								}
 
 							}
@@ -384,7 +538,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address,
 				}
 
 				try {
-					Thread.sleep(30);
+					Thread.sleep(GAME_REFRESHEMENT);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -392,61 +546,11 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address,
 
 			this.refresh();
 		}).start();
-
-		new Thread(() -> {
-			int i = 0;
-
-			while (inGame) {
-				try {
-					ObstacleEntityInterface obstacle = new ObstacleEntity(20, 20, new MathVector(WIDTH, 0),
-							new MathVector(-1, 0), i++);
-					obstacles.add(obstacle);
-					for (PlayerInterface player : players) {
-						player.getObservablePlayers().addObstacle(obstacle);
-					}
-				} catch (RemoteException e1) {
-					e1.printStackTrace();
-				}
-
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-
-			}
-		}).start();
-
-		new Thread(() -> {
-			MathVectorInterface vecteur;
-			float speed = 2;
-
-			while (inGame) {
-				for (ObstacleEntityInterface obstacle : obstacles) {
-					try {
-						if (obstacle.getPosition().getX() + obstacle.getWidth() < 0) {
-							for (PlayerInterface player : players) {
-								player.getObservablePlayers().removeObstacle(obstacle);
-							}
-						} else {
-							vecteur = obstacle.getPosition().sumVector(obstacle.getDirection().factorVector(speed));
-							obstacle.getPosition().setVector(vecteur.getX(), vecteur.getY());
-						}
-					} catch (RemoteException e) {
-						e.printStackTrace();
-					}
-
-				}
-				try {
-					Thread.sleep(20);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}).start();
-
 	}
 
+	/**
+	 * Permet de réinitialiser le lobby afin de pouvoir relancer une partie derrière.
+	 */
 	private void refresh() {
 		this.inGame = false;
 

@@ -1,8 +1,9 @@
-package com.alma.splashbimboombidaboum.utility;
+package com.alma.splashbimboombidaboum.server;
 
 import java.rmi.RemoteException;
 
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
+import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 
 /**
  * <b>Classe représentant un obstacle.</b>
@@ -185,12 +186,12 @@ public class ObstacleEntity extends Entity implements ObstacleEntityInterface {
 	 * {@inheritDoc}
 	 */
 	public boolean collision(PlayerInterface player) throws RemoteException {
-		float leftMax = Math.max(this.getPosition().getX(), player.getCoordinates().getPosition().getX());
+		float leftMax = Math.max(this.getPosition().getX(), player.getPlayerEntity().getPosition().getX());
 		float rightMin = Math.min(this.getPosition().getX() + this.getWidth(),
-				player.getCoordinates().getPosition().getX() + player.getCoordinates().getWidth());
-		float downMax = Math.max(this.getPosition().getY(), player.getCoordinates().getPosition().getY());
+				player.getPlayerEntity().getPosition().getX() + player.getPlayerEntity().getWidth());
+		float downMax = Math.max(this.getPosition().getY(), player.getPlayerEntity().getPosition().getY());
 		float upMin = Math.min(this.getPosition().getY() + this.getHeight(),
-				player.getCoordinates().getPosition().getY() + player.getCoordinates().getHeight());
+				player.getPlayerEntity().getPosition().getY() + player.getPlayerEntity().getHeight());
 
 		return (leftMax < rightMin) && (downMax < upMin);
 	}

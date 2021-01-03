@@ -3,14 +3,10 @@ package com.alma.splashbimboombidaboum.client;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import com.alma.splashbimboombidaboum.utility.ObstacleEntityInterface;
+import com.alma.splashbimboombidaboum.server.ObstacleEntityInterface;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleMapProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableStringValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -75,8 +71,8 @@ public class ObservableData extends UnicastRemoteObject implements ObservableDat
 	public void changeCoordinatesPlayer(PlayerInterface player, float x, float y) throws RemoteException {
 		for (PlayerInterface currentPlayer : players) {
 			if (currentPlayer.getName().equals(player.getName())) {
-				currentPlayer.getCoordinates().getPosition().setX(x);
-				currentPlayer.getCoordinates().getPosition().setY(y);
+				currentPlayer.getPlayerEntity().getPosition().setX(x);
+				currentPlayer.getPlayerEntity().getPosition().setY(y);
 			}
 			break;
 		}

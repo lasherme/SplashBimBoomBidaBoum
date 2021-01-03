@@ -1,9 +1,7 @@
 package com.alma.splashbimboombidaboum.client.controller;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ResourceBundle;
 
@@ -28,7 +26,7 @@ public class PlayMenuController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
-			Main.player.createLocalPlayers();
+			Main.player.createObservablePlayers();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

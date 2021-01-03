@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import com.alma.splashbimboombidaboum.client.controller.MainController;
 import com.alma.splashbimboombidaboum.utility.Address;
 
 import javafx.application.Application;

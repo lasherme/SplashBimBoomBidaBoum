@@ -3,8 +3,8 @@ package com.alma.splashbimboombidaboum.client;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
+import com.alma.splashbimboombidaboum.server.Entity;
 import com.alma.splashbimboombidaboum.utility.Direction;
-import com.alma.splashbimboombidaboum.utility.Entity;
 import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 
 public class PlayerEntity extends Entity implements PlayerEntityInterface {

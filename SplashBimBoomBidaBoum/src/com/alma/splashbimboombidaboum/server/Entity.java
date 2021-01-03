@@ -1,7 +1,10 @@
-package com.alma.splashbimboombidaboum.utility;
+package com.alma.splashbimboombidaboum.server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+
+import com.alma.splashbimboombidaboum.utility.MathVector;
+import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 
 /**
  * <b>Classe abstraite représentant une entité.</b>

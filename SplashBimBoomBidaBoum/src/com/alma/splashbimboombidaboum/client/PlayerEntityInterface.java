@@ -4,8 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
+import com.alma.splashbimboombidaboum.server.EntityInterface;
 import com.alma.splashbimboombidaboum.utility.Direction;
-import com.alma.splashbimboombidaboum.utility.EntityInterface;
 import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 
 public interface PlayerEntityInterface extends EntityInterface {

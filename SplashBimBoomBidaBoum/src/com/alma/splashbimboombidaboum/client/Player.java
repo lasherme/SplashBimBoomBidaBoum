@@ -17,38 +17,22 @@ import javafx.scene.paint.Color;
 public class Player extends UnicastRemoteObject implements PlayerInterface, Address {
 	private String name;
 	private boolean ready = false;
-	private Color color = Color.BLACK;
+	private Color color;
 	private String colorString = "";
-	private PlayerEntityInterface coord;
-	private ObservableDataInterface observablePlayers;
-	private RoomReservationInterface server;
-	private RoomInterface room;
 	private Scene scene;
 	private WaitingRoomController waitingRoom;
+	private RoomReservationInterface server;
+	private RoomInterface room;
+	private PlayerEntityInterface playerEntity;
+	private ObservableDataInterface observablePlayers;
 
 	public Player(String name) throws RemoteException {
 		this.name = name;
-		this.coord = new PlayerEntity();
+		this.playerEntity = new PlayerEntity();
 	}
 
-	public void createLocalPlayers() throws RemoteException {
-		this.observablePlayers = new ObservableData();
-	}
-	
-	public WaitingRoomController getWaitingRoom() throws RemoteException {
-		return this.waitingRoom;
-	}
-
-	public void setWaitingRoom(WaitingRoomController waitingRoom) throws RemoteException {
-		this.waitingRoom = waitingRoom;
-	}
-
-	public Scene getScene() throws RemoteException {
-		return this.scene;
-	}
-
-	public void setScene(Scene scene) throws RemoteException {
-		this.scene = scene;
+	public String getName() throws RemoteException {
+		return this.name;
 	}
 
 	public boolean getState() throws RemoteException {
@@ -59,21 +43,12 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 		return this.colorString;
 	}
 
-	public void setColor(String color) throws RemoteException {
-		this.color = Color.web(color);
-		this.colorString = color;
+	public Scene getScene() throws RemoteException {
+		return this.scene;
 	}
 
-	public PlayerEntityInterface getCoordinates() throws RemoteException {
-		return this.coord;
-	}
-
-	public void setState(boolean ready) throws RemoteException {
-		this.ready = ready;
-	}
-
-	public ObservableDataInterface getObservablePlayers() throws RemoteException {
-		return this.observablePlayers;
+	public WaitingRoomController getWaitingRoom() throws RemoteException {
+		return this.waitingRoom;
 	}
 
 	public RoomReservationInterface getServer() throws RemoteException {
@@ -84,16 +59,33 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 		return this.room;
 	}
 
-	public String getName() throws RemoteException {
-		return this.name;
+	public PlayerEntityInterface getPlayerEntity() throws RemoteException {
+		return this.playerEntity;
 	}
 
-	public void setRoom(RoomInterface room) throws RemoteException {
-		this.room = room;
+	public ObservableDataInterface getObservablePlayers() throws RemoteException {
+		return this.observablePlayers;
 	}
 
 	public void setName(String name) throws RemoteException {
 		this.name = name;
+	}
+
+	public void setState(boolean ready) throws RemoteException {
+		this.ready = ready;
+	}
+
+	public void setColor(String color) throws RemoteException {
+		this.color = Color.web(color);
+		this.colorString = color;
+	}
+
+	public void setScene(Scene scene) throws RemoteException {
+		this.scene = scene;
+	}
+
+	public void setWaitingRoom(WaitingRoomController waitingRoom) throws RemoteException {
+		this.waitingRoom = waitingRoom;
 	}
 
 	public RoomReservationInterface connection() throws MalformedURLException, RemoteException, NotBoundException {
@@ -102,6 +94,14 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 		return this.server;
 	}
 
+	public void setRoom(RoomInterface room) throws RemoteException {
+		this.room = room;
+	}
+
+	public void createObservablePlayers() throws RemoteException {
+		this.observablePlayers = new ObservableData();
+	}
+	
 	public RoomInterface roomConnection() throws RemoteException {
 		this.room = server.getRoom(this);
 

@@ -4,6 +4,12 @@ import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 
+/**
+ * Le main du serveur. 
+ * 
+ * @author Éloi Filaudeau, Louis Boursier, Nicolas Hawa, Loïc Lasherme
+ * @version 1.0
+ */
 public class Main {
 
 	static {

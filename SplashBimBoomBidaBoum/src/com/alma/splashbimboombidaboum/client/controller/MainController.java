@@ -1,14 +1,11 @@
 package com.alma.splashbimboombidaboum.client.controller;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ResourceBundle;
 
 import com.alma.splashbimboombidaboum.client.Main;
-import com.alma.splashbimboombidaboum.client.PlayerInterface;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;

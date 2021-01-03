@@ -11,7 +11,7 @@ import com.alma.splashbimboombidaboum.client.PlayerInterface;
  * Elle peut être utilisée comme objet distant.
  * </p>
  * <p>
- * La réservation des lobbys est caractérisée par l'nformation suivante :
+ * La réservation des lobbys est caractérisée par l'information suivante :
  * <ul>
  * <li>Une liste de lobby</li>
  * </ul>

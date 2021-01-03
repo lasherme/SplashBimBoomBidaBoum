@@ -1,4 +1,4 @@
-package com.alma.splashbimboombidaboum.utility;
+package com.alma.splashbimboombidaboum.server;
 
 import java.rmi.RemoteException;
 

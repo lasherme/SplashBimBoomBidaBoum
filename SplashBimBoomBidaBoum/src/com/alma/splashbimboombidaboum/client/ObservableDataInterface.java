@@ -3,10 +3,9 @@ package com.alma.splashbimboombidaboum.client;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import com.alma.splashbimboombidaboum.utility.ObstacleEntityInterface;
+import com.alma.splashbimboombidaboum.server.ObstacleEntityInterface;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 

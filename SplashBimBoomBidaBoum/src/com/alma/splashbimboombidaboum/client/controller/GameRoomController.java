@@ -9,8 +9,8 @@ import java.util.ResourceBundle;
 
 import com.alma.splashbimboombidaboum.client.Main;
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
+import com.alma.splashbimboombidaboum.server.ObstacleEntityInterface;
 import com.alma.splashbimboombidaboum.utility.Direction;
-import com.alma.splashbimboombidaboum.utility.ObstacleEntityInterface;
 import com.alma.splashbimboombidaboum.utility.WindowSize;
 
 import javafx.application.Platform;
@@ -62,18 +62,18 @@ public class GameRoomController implements Initializable, WindowSize {
 					});
 
 			for (PlayerInterface enemy : Main.player.getObservablePlayers().getPlayers()) {
-				Rectangle r = new Rectangle(enemy.getCoordinates().getWidth(), enemy.getCoordinates().getHeight(),
+				Rectangle r = new Rectangle(enemy.getPlayerEntity().getWidth(), enemy.getPlayerEntity().getHeight(),
 						Color.web(enemy.getColor()));
-				r.setX(enemy.getCoordinates().getPosition().getX());
-				r.setY(enemy.getCoordinates().getPosition().getY());
+				r.setX(enemy.getPlayerEntity().getPosition().getX());
+				r.setY(enemy.getPlayerEntity().getPosition().getY());
 				enemiesRectangle.put(enemy, r);
 				stackPane.getChildren().add(r);
 			}
 
-			playerRectangle = new Rectangle(Main.player.getCoordinates().getWidth(),
-					Main.player.getCoordinates().getHeight(), Color.web(Main.player.getColor()));
-			playerRectangle.setX(Main.player.getCoordinates().getPosition().getX());
-			playerRectangle.setY(Main.player.getCoordinates().getPosition().getY());
+			playerRectangle = new Rectangle(Main.player.getPlayerEntity().getWidth(),
+					Main.player.getPlayerEntity().getHeight(), Color.web(Main.player.getColor()));
+			playerRectangle.setX(Main.player.getPlayerEntity().getPosition().getX());
+			playerRectangle.setY(Main.player.getPlayerEntity().getPosition().getY());
 			stackPane.getChildren().add(playerRectangle);
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -89,23 +89,23 @@ public class GameRoomController implements Initializable, WindowSize {
 	protected void handleOnKeyPressed(KeyEvent e) throws IOException {
 		switch (e.getCode()) {
 		case Q:
-			if (!Main.player.getCoordinates().getKeyDirection().contains(Direction.LEFT)) {
-				Main.player.getCoordinates().addKeyDirection(Direction.LEFT);
+			if (!Main.player.getPlayerEntity().getKeyDirection().contains(Direction.LEFT)) {
+				Main.player.getPlayerEntity().addKeyDirection(Direction.LEFT);
 			}
 			break;
 		case D:
-			if (!Main.player.getCoordinates().getKeyDirection().contains(Direction.RIGHT)) {
-				Main.player.getCoordinates().addKeyDirection(Direction.RIGHT);
+			if (!Main.player.getPlayerEntity().getKeyDirection().contains(Direction.RIGHT)) {
+				Main.player.getPlayerEntity().addKeyDirection(Direction.RIGHT);
 			}
 			break;
 		case Z:
-			if (!Main.player.getCoordinates().getKeyDirection().contains(Direction.UP)) {
-				Main.player.getCoordinates().addKeyDirection(Direction.UP);
+			if (!Main.player.getPlayerEntity().getKeyDirection().contains(Direction.UP)) {
+				Main.player.getPlayerEntity().addKeyDirection(Direction.UP);
 			}
 			break;
 		case S:
-			if (!Main.player.getCoordinates().getKeyDirection().contains(Direction.DOWN)) {
-				Main.player.getCoordinates().addKeyDirection(Direction.DOWN);
+			if (!Main.player.getPlayerEntity().getKeyDirection().contains(Direction.DOWN)) {
+				Main.player.getPlayerEntity().addKeyDirection(Direction.DOWN);
 			}
 			break;
 		default:
@@ -117,16 +117,16 @@ public class GameRoomController implements Initializable, WindowSize {
 	protected void handleOnKeyReleased(KeyEvent e) throws IOException {
 		switch (e.getCode()) {
 		case Q:
-			Main.player.getCoordinates().removeKeyDirection(Direction.LEFT);
+			Main.player.getPlayerEntity().removeKeyDirection(Direction.LEFT);
 			break;
 		case D:
-			Main.player.getCoordinates().removeKeyDirection(Direction.RIGHT);
+			Main.player.getPlayerEntity().removeKeyDirection(Direction.RIGHT);
 			break;
 		case Z:
-			Main.player.getCoordinates().removeKeyDirection(Direction.UP);
+			Main.player.getPlayerEntity().removeKeyDirection(Direction.UP);
 			break;
 		case S:
-			Main.player.getCoordinates().removeKeyDirection(Direction.DOWN);
+			Main.player.getPlayerEntity().removeKeyDirection(Direction.DOWN);
 			break;
 		default:
 			break;
@@ -141,8 +141,8 @@ public class GameRoomController implements Initializable, WindowSize {
 					Platform.runLater(() -> {
 						try {
 							if (stackPane.getChildren().contains(playerRectangle)) {
-								playerRectangle.setTranslateX(Main.player.getCoordinates().getPosition().getX());
-								playerRectangle.setTranslateY(Main.player.getCoordinates().getPosition().getY());
+								playerRectangle.setTranslateX(Main.player.getPlayerEntity().getPosition().getX());
+								playerRectangle.setTranslateY(Main.player.getPlayerEntity().getPosition().getY());
 							}
 						} catch (RemoteException e) {
 							e.printStackTrace();
@@ -153,8 +153,8 @@ public class GameRoomController implements Initializable, WindowSize {
 						Platform.runLater(() -> {
 
 							try {
-								enemiesRectangle.get(enemy).setTranslateX(enemy.getCoordinates().getPosition().getX());
-								enemiesRectangle.get(enemy).setTranslateY(enemy.getCoordinates().getPosition().getY());
+								enemiesRectangle.get(enemy).setTranslateX(enemy.getPlayerEntity().getPosition().getX());
+								enemiesRectangle.get(enemy).setTranslateY(enemy.getPlayerEntity().getPosition().getY());
 							} catch (RemoteException e) {
 								e.printStackTrace();
 							}
@@ -181,7 +181,7 @@ public class GameRoomController implements Initializable, WindowSize {
 				e1.printStackTrace();
 			}
 			try {
-				Main.player.getCoordinates().getKeyDirection().clear();
+				Main.player.getPlayerEntity().getKeyDirection().clear();
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 			}

@@ -1,7 +1,9 @@
-package com.alma.splashbimboombidaboum.utility;
+package com.alma.splashbimboombidaboum.server;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+
+import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 
 /**
  * <b>Interface représentant une entité.</b>
