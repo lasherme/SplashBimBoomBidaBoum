@@ -44,7 +44,7 @@ public class WaitingRoomController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
-			Main.player.getLocalPlayers().getPlayers()
+			Main.player.getObservablePlayers().getPlayers()
 					.addListener((ListChangeListener.Change<? extends PlayerInterface> change) -> {
 						while (change.next()) {
 							if (change.wasAdded()) {
@@ -59,11 +59,11 @@ public class WaitingRoomController implements Initializable {
 							}
 						}
 					});
-			Main.player.getLocalPlayers().getGameStart().addListener((observable, oldValue, newValue) -> {
+			Main.player.getObservablePlayers().getGameStart().addListener((observable, oldValue, newValue) -> {
 				if (newValue) {
 					Platform.runLater(() -> {
 						try {
-							Main.player.getLocalPlayers().setGameStart(false);
+							Main.player.getObservablePlayers().setGameStart(false);
 							Parent root = FXMLLoader.load(getClass().getResource("../resources/fxml/GameRoom.fxml"));
 							Stage stage = (Stage) this.mainVBox.getScene().getWindow();
 							stage.setScene(new Scene(root));
@@ -74,7 +74,7 @@ public class WaitingRoomController implements Initializable {
 					});
 				}
 			});
-			Main.player.getLocalPlayers().getReady()
+			Main.player.getObservablePlayers().getReady()
 					.addListener((MapChangeListener<PlayerInterface, Boolean>) change -> {
 						
 					});
@@ -84,7 +84,7 @@ public class WaitingRoomController implements Initializable {
 			
 			for (PlayerInterface player : Main.player.getRoom().getPlayers()) {
 				if (!player.getName().equals(Main.player.getName())) {
-					Main.player.getLocalPlayers().addPlayer(player);
+					Main.player.getObservablePlayers().addPlayer(player);
 				}
 			}
 

@@ -3,53 +3,137 @@ package com.alma.splashbimboombidaboum.server;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.alma.splashbimboombidaboum.client.PlayerInterface;
 import com.alma.splashbimboombidaboum.utility.Address;
 import com.alma.splashbimboombidaboum.utility.Direction;
+import com.alma.splashbimboombidaboum.utility.InGameValues;
 import com.alma.splashbimboombidaboum.utility.MathVector;
 import com.alma.splashbimboombidaboum.utility.MathVectorInterface;
 import com.alma.splashbimboombidaboum.utility.ObstacleEntity;
 import com.alma.splashbimboombidaboum.utility.ObstacleEntityInterface;
 import com.alma.splashbimboombidaboum.utility.PlayerColor;
 import com.alma.splashbimboombidaboum.utility.WindowSize;
-import com.sun.media.jfxmediaimpl.platform.osx.OSXPlatform;
 
-public class Room extends UnicastRemoteObject implements RoomInterface, Address {
-	private String id;
+/**
+ * 
+ * @author Éloi Filaudeau, Louis Boursier, Nicolas Hawa, Loïc Lasherme
+ * @version 1.0
+ */
+public class Room extends UnicastRemoteObject implements RoomInterface, Address, InGameValues, WindowSize {
+	/**
+	 * L'identifiant du lobby. L'attribut "id" ne peut pas être modifié.
+	 * 
+	 * @see Room#getId()
+	 */
+	private final String id;
+
+	/**
+	 * Le nombre de joueur max du lobby. L'attribut "maxPlayer" peut être modifié.
+	 * 
+	 * @see Room#getMaxPlayer()
+	 * @see Room#setMaxPlayer(int)
+	 */
 	private int maxPlayer;
+
+	/**
+	 * Le nombre de joueur en attente de réservation du lobby. L'attribut "queue" ne
+	 * peut pas être modifié.
+	 * 
+	 * @see Room#getQueue()
+	 */
 	private int queue = 0;
-	private RoomReservationInterface roomReservation;
-	private ArrayList<PlayerInterface> players = new ArrayList<PlayerInterface>();
-	/** true when players can connect to this Room, false otherwise */
-	private boolean isOpen = false;
+
+	/**
+	 * Le boolean permettant de savoir si la partie est en cours. L'attribut
+	 * "inGame" ne peut pas être modifié.
+	 * 
+	 * @see Room#getInGame()
+	 */
 	private boolean inGame = false;
-	private ArrayList<PlayerColor> colors = new ArrayList<PlayerColor>();
-	private ArrayList<PlayerColor> colorsRemove = new ArrayList<PlayerColor>();
-	private CopyOnWriteArrayList<ObstacleEntityInterface> obstacles = new CopyOnWriteArrayList<ObstacleEntityInterface>();
+
+	/**
+	 * La référence vers l'objet qui permet la réservation des lobbys. L'attribut
+	 * "roomReservation" ne peut pas être modifié.
+	 */
+	private RoomReservationInterface roomReservation;
+
+	/**
+	 * La liste des joueurs présent dans le lobby. L'attribut "players" peut être
+	 * modifié.
+	 * 
+	 * @see Room#getPlayers()
+	 * @see Room#removePlayer(PlayerInterface)
+	 * @see Room#roomConnectionBis(PlayerInterface)
+	 * @see PlayerInterface
+	 */
+	private ArrayList<PlayerInterface> players = new ArrayList<PlayerInterface>();
+
+	/**
+	 * La liste des joueurs morts au cours de la partie. L'attribut "deads" ne peut
+	 * pas être modifié.
+	 * 
+	 * @see PlayerInterface
+	 */
 	private ArrayList<PlayerInterface> deads = new ArrayList<PlayerInterface>();
 
+	/**
+	 * La liste "thread safe" des obstacles créés au cours de la partie. L'attribut
+	 * "obstacles" ne peut pas être modifié.
+	 * 
+	 * @see ObstacleEntityInterface
+	 */
+	private CopyOnWriteArrayList<ObstacleEntityInterface> obstacles = new CopyOnWriteArrayList<ObstacleEntityInterface>();
+
+	/**
+	 * La liste des couleurs restantes du lobby. L'attribut "colorsRemain" ne peut
+	 * pas être modifié.
+	 *
+	 * @see PlayerColor
+	 */
+	private ArrayList<PlayerColor> colorsRemain = new ArrayList<PlayerColor>();
+
+	/**
+	 * La liste des couleurs déjà utilisées par les autres joueurs de la partie.
+	 * L'attribut "colorsRemove" ne peut pas être modifié.
+	 * 
+	 * @see PlayerColor
+	 */
+	private ArrayList<PlayerColor> colorsRemove = new ArrayList<PlayerColor>();
+
+	/**
+	 * Constructeur : Room
+	 * 
+	 * <p>
+	 * À la construction d'un objet Room, les valeurs suivantes sont initialisées :
+	 * <ul>
+	 * <li>id</li>
+	 * <li>maxPlayer</li>
+	 * <li>roomReservation</li>
+	 * <li>colorsRemain</li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @param id              L'identifiant unique du lobby.
+	 * @param maxPlayer       Le nombre maximum de joueur dans le lobby.
+	 * @param roomReservation La référence vers l'objet des réservations des lobbys.
+	 * @throws RemoteException
+	 * @see PlayerColor
+	 * @see RoomReservationInterface
+	 */
 	public Room(String id, int maxPlayer, RoomReservationInterface roomReservation) throws RemoteException {
 		this.id = id;
 		this.maxPlayer = maxPlayer;
 		this.roomReservation = roomReservation;
-		this.isOpen = true;
 
 		for (PlayerColor color : PlayerColor.values()) {
-			colors.add(color);
+			colorsRemain.add(color);
 		}
-
-		System.out.println("Room ID : " + this.id);
 	}
-
+	
 	public String getId() throws RemoteException {
 		return this.id;
-	}
-
-	public boolean getInGame() throws RemoteException {
-		return this.inGame;
 	}
 
 	public int getMaxPlayer() throws RemoteException {
@@ -60,21 +144,23 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 		return this.queue;
 	}
 
-	public int getSize() throws RemoteException {
-		return this.players.size();
-	}
-
-	public boolean getIsOpen() throws RemoteException {
-		return this.isOpen;
+	public boolean getInGame() throws RemoteException {
+		return this.inGame;
 	}
 
 	public ArrayList<PlayerInterface> getPlayers() throws RemoteException {
 		return this.players;
 	}
 
+	/*
+	 * 
+	 * 
+	 * 
+	 */
+
 	public void setMaxPlayer(int maxPlayer) {
 
-		if (maxPlayer >= 4) {
+		if (maxPlayer > 1 && this.players.size() > maxPlayer) {
 			this.maxPlayer = maxPlayer;
 		}
 	}
@@ -85,7 +171,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 			this.players.remove(player);
 
 			for (PlayerInterface currentPlayer : players) {
-				currentPlayer.getLocalPlayers().removePlayer(player);
+				currentPlayer.getObservablePlayers().removePlayer(player);
 			}
 
 			PlayerColor colorBuffer = null;
@@ -96,7 +182,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 				}
 			}
 			colorsRemove.remove(colorBuffer);
-			colors.add(colorBuffer);
+			colorsRemain.add(colorBuffer);
 
 			if (players.size() <= 0) {
 				this.roomReservation.removeRoom(this);
@@ -114,15 +200,6 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 		return currentRoom;
 	}
 
-	/**
-	 * Connect player to this room.
-	 * <p>
-	 * Adds player into this players list and give it a color.
-	 * 
-	 * @param player the player parameter, not null
-	 * @return this if it is not full, null otherwise
-	 * @throws RemoteException
-	 */
 	private synchronized RoomInterface roomConnectionBis(PlayerInterface player) throws RemoteException {
 		RoomInterface currentRoom = null;
 		int i;
@@ -136,15 +213,15 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 			}
 
 			// Give random color for the player.
-			int randomColorIndex = (int) (Math.random() * colors.size());
-			PlayerColor randomColor = colors.get(randomColorIndex);
+			int randomColorIndex = (int) (Math.random() * colorsRemain.size());
+			PlayerColor randomColor = colorsRemain.get(randomColorIndex);
 			player.setColor(randomColor.getPlayerColor());
-			colors.remove(randomColor);
+			colorsRemain.remove(randomColor);
 			colorsRemove.add(randomColor);
 
 			// Update players' waiting room with new player.
 			for (PlayerInterface currentPlayer : players) {
-				currentPlayer.getLocalPlayers().addPlayer(player);
+				currentPlayer.getObservablePlayers().addPlayer(player);
 			}
 			this.players.add(player);
 			currentRoom = this;
@@ -168,15 +245,15 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 
 		for (PlayerInterface currentPlayer : players) {
 			if (currentPlayer != player) {
-				currentPlayer.getLocalPlayers().setState(player, ready);
+				currentPlayer.getObservablePlayers().setState(player, ready);
 			}
 			if (currentPlayer.getState()) {
 				nbReady++;
 			}
 		}
 
-		if (nbReady == this.getSize() && nbReady > 1) {
-			isOpen = false;
+		if (nbReady == this.getPlayers().size() && nbReady > 1) {
+			inGame = true;
 			this.startGame();
 		}
 	}
@@ -184,23 +261,22 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 	private void startGame() throws RemoteException {
 		this.initialization();
 		for (PlayerInterface player : players) {
-			player.getLocalPlayers().setGameStart(true);
+			player.getObservablePlayers().setGameStart(true);
 		}
 		this.game();
 	}
 
 	private void initialization() throws RemoteException {
-		inGame = true;
 		float position = 0;
 		float spacing = 20;
 
 		for (PlayerInterface player : players) {
 			player.setColor(player.getColor());
-			player.getCoordinates().setSize(WindowSize.size);
+			player.getCoordinates().setSize(SIZE);
 			player.getCoordinates().getPosition().setVector(position, 0);
 			player.getCoordinates().getDirection().setVector(0, 0);
 
-			position += WindowSize.size + spacing;
+			position += SIZE + spacing;
 		}
 	}
 
@@ -242,14 +318,14 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 								}
 							}
 
-							vectorBuffer = directionVector.factorVector(WindowSize.speed);
+							vectorBuffer = directionVector.factorVector(SPEED);
 							vectorBuffer = vectorBuffer.sumVector(gravityVector);
 							vectorBuffer = vectorBuffer.averageVector(playerDirectionVector);
 							playerDirectionVector.setVector(vectorBuffer.getX(), vectorBuffer.getY());
 
 							vectorBuffer = vectorBuffer.sumVector(playerPositionVector);
-							x = Math.min(vectorBuffer.getX() + WindowSize.size, WindowSize.width) - WindowSize.size;
-							y = Math.min(vectorBuffer.getY() + WindowSize.size, WindowSize.height) - WindowSize.size;
+							x = Math.min(vectorBuffer.getX() + SIZE, WIDTH) - SIZE;
+							y = Math.min(vectorBuffer.getY() + SIZE, HEIGHT) - SIZE;
 
 							playerPositionVector.setVector(Math.max(0, x), Math.max(0, y));
 						} catch (RemoteException e1) {
@@ -273,7 +349,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 
 							for (PlayerInterface localPlayer : players) {
 								if (localPlayer != player) {
-									localPlayer.getLocalPlayers().changeCoordinatesPlayer(player,
+									localPlayer.getObservablePlayers().changeCoordinatesPlayer(player,
 											player.getCoordinates().getPosition().getX(),
 											player.getCoordinates().getPosition().getY());
 								}
@@ -284,14 +360,14 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 								if (obstacle.collision(player)) {
 									deads.add(player);
 									for (PlayerInterface localPlayer : players) {
-										localPlayer.getLocalPlayers().addDead(player);
+										localPlayer.getObservablePlayers().addDead(player);
 									}
 
 									if (deads.size() >= players.size() - 1) {
 										for (PlayerInterface currentPlayer : players) {
 											if (!deads.contains(currentPlayer)) {
 												for (PlayerInterface p : players) {
-													p.getLocalPlayers().addDead(currentPlayer);
+													p.getObservablePlayers().addDead(currentPlayer);
 												}
 												break;
 											}
@@ -322,11 +398,11 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 
 			while (inGame) {
 				try {
-					ObstacleEntityInterface obstacle = new ObstacleEntity(20, 20, new MathVector(WindowSize.width, 0),
+					ObstacleEntityInterface obstacle = new ObstacleEntity(20, 20, new MathVector(WIDTH, 0),
 							new MathVector(-1, 0), i++);
 					obstacles.add(obstacle);
 					for (PlayerInterface player : players) {
-						player.getLocalPlayers().addObstacle(obstacle);
+						player.getObservablePlayers().addObstacle(obstacle);
 					}
 				} catch (RemoteException e1) {
 					e1.printStackTrace();
@@ -350,7 +426,7 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 					try {
 						if (obstacle.getPosition().getX() + obstacle.getWidth() < 0) {
 							for (PlayerInterface player : players) {
-								player.getLocalPlayers().removeObstacle(obstacle);
+								player.getObservablePlayers().removeObstacle(obstacle);
 							}
 						} else {
 							vecteur = obstacle.getPosition().sumVector(obstacle.getDirection().factorVector(speed));
@@ -372,7 +448,6 @@ public class Room extends UnicastRemoteObject implements RoomInterface, Address 
 	}
 
 	private void refresh() {
-		this.isOpen = true;
 		this.inGame = false;
 
 		obstacles = new CopyOnWriteArrayList<ObstacleEntityInterface>();

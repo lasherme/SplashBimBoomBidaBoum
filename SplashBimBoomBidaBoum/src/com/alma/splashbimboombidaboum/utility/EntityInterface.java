@@ -23,7 +23,6 @@ import java.rmi.RemoteException;
  * @version 1.0
  */
 public interface EntityInterface extends Remote {
-
 	/**
 	 * Retourne la largeur de l'entité.
 	 * 

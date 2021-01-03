@@ -20,7 +20,7 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	private Color color = Color.BLACK;
 	private String colorString = "";
 	private PlayerEntityInterface coord;
-	private ObservableDataInterface players;
+	private ObservableDataInterface observablePlayers;
 	private RoomReservationInterface server;
 	private RoomInterface room;
 	private Scene scene;
@@ -32,7 +32,7 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 	}
 
 	public void createLocalPlayers() throws RemoteException {
-		this.players = new ObservableData();
+		this.observablePlayers = new ObservableData();
 	}
 	
 	public WaitingRoomController getWaitingRoom() throws RemoteException {
@@ -72,8 +72,8 @@ public class Player extends UnicastRemoteObject implements PlayerInterface, Addr
 		this.ready = ready;
 	}
 
-	public ObservableDataInterface getLocalPlayers() throws RemoteException {
-		return this.players;
+	public ObservableDataInterface getObservablePlayers() throws RemoteException {
+		return this.observablePlayers;
 	}
 
 	public RoomReservationInterface getServer() throws RemoteException {

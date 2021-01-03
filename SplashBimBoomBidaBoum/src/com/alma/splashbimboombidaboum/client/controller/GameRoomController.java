@@ -26,7 +26,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class GameRoomController implements Initializable {
+public class GameRoomController implements Initializable, WindowSize {
 	@FXML
 	private StackPane stackPane;
 	private Rectangle playerRectangle;
@@ -35,11 +35,11 @@ public class GameRoomController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		stackPane.setPrefHeight(WindowSize.height);
-		stackPane.setPrefWidth(WindowSize.width);
+		stackPane.setPrefHeight(HEIGHT);
+		stackPane.setPrefWidth(WIDTH);
 
 		try {
-			Main.player.getLocalPlayers().getObstacle()
+			Main.player.getObservablePlayers().getObstacle()
 					.addListener((ListChangeListener.Change<? extends ObstacleEntityInterface> change) -> {
 						while (change.next()) {
 							if (change.wasAdded()) {
@@ -50,7 +50,7 @@ public class GameRoomController implements Initializable {
 						}
 					});
 
-			Main.player.getLocalPlayers().getDeads()
+			Main.player.getObservablePlayers().getDeads()
 					.addListener((ListChangeListener.Change<? extends PlayerInterface> change) -> {
 						while (change.next()) {
 							if (change.wasAdded()) {
@@ -61,7 +61,7 @@ public class GameRoomController implements Initializable {
 						}
 					});
 
-			for (PlayerInterface enemy : Main.player.getLocalPlayers().getPlayers()) {
+			for (PlayerInterface enemy : Main.player.getObservablePlayers().getPlayers()) {
 				Rectangle r = new Rectangle(enemy.getCoordinates().getWidth(), enemy.getCoordinates().getHeight(),
 						Color.web(enemy.getColor()));
 				r.setX(enemy.getCoordinates().getPosition().getX());

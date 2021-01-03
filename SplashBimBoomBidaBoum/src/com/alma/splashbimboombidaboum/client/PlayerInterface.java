@@ -33,7 +33,7 @@ public interface PlayerInterface extends Remote {
 
 	public PlayerEntityInterface getCoordinates() throws RemoteException;
 
-	public ObservableDataInterface getLocalPlayers() throws RemoteException;
+	public ObservableDataInterface getObservablePlayers() throws RemoteException;
 
 	public RoomReservationInterface getServer() throws RemoteException;
 

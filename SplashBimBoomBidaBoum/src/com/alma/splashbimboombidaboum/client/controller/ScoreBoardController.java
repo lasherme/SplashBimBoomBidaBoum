@@ -25,13 +25,13 @@ public class ScoreBoardController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
-			Collections.reverse(Main.player.getLocalPlayers().getDeads());
+			Collections.reverse(Main.player.getObservablePlayers().getDeads());
 			int i = 1;
-			for(PlayerInterface player : Main.player.getLocalPlayers().getDeads()) {
+			for(PlayerInterface player : Main.player.getObservablePlayers().getDeads()) {
 				playersVBox.getChildren().add(new Label(i++ + ". "+ player.getName()));
 			}
 			Main.player.getWaitingRoom().handleStatueButtonAction(null);
-			Main.player.getLocalPlayers().reset();
+			Main.player.getObservablePlayers().reset();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
